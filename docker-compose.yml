@@ -1,0 +1,33 @@
+
+services:
+  database:
+    container_name: mongo
+    image: mongo
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+    volumes:
+      - db_data:/data/db
+
+  # Если ты будешь собирать статику, то добавь эти три строчке в конце своего docker-файла
+  # RUN npm run build
+  # FROM caddy:2-alpine as serve
+  # COPY --from=build /app/build /srv
+  frontend:
+      restart: unless-stopped
+      build:
+        context: frontend
+        dockerfile: Dockerfile
+      cap_add: NET_ADMIN
+      ports: [ 80:80, 443:443 ]
+      volumes:
+        - ./Caddyfile:/etc/caddy/Caddyfile
+        - caddy_data:/data
+        - caddy_config:/config
+      env_file: .env
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:
