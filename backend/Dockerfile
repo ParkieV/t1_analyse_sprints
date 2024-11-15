@@ -1,4 +1,4 @@
-FROM python:3.12.5-slim AS base
+FROM python:3.12.7-slim AS base
 
 ENV TZ="Europe/Moscow"
 

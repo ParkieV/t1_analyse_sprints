@@ -12,14 +12,14 @@ services:
 
   backend:
     restart: unless-stopped
+    build:
+      context: backend
+      dockerfile: Dockerfile
     env_file: .env
     environment:
       APP_PORT: ${BACKEND_PORT}
       APP_HOST: ${BACKEND_HOST}
     ports: [ "8080:${BACKEND_PORT}" ]
-    build:
-      context: backend
-      dockerfile: Dockerfile
     depends_on:
       database:
         condition: service_started
@@ -28,20 +28,20 @@ services:
   # RUN npm run build
   # FROM caddy:2-alpine as serve
   # COPY --from=build /app/build /srv
-  frontend:
-      restart: unless-stopped
-      build:
-        context: frontend
-        dockerfile: Dockerfile
-      cap_add: [ NET_ADMIN ]
-      ports: [ 80:80, 443:443 ]
-      volumes:
-        - ./Caddyfile:/etc/caddy/Caddyfile
-        - caddy_data:/data
-        - caddy_config:/config
-      env_file: .env
+#  frontend:
+#      restart: unless-stopped
+#      build:
+#        context: frontend
+#        dockerfile: Dockerfile
+#      cap_add: [ NET_ADMIN ]
+#      ports: [ 80:80, 443:443 ]
+#      volumes:
+#        - ./Caddyfile:/etc/caddy/Caddyfile
+#        - caddy_data:/data
+#        - caddy_config:/config
+#      env_file: .env
 
 volumes:
   db_data:
-  caddy_data:
-  caddy_config:
+#  caddy_data:
+#  caddy_config:
