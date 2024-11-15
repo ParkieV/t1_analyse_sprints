@@ -1,16 +1,16 @@
 from fastapi import Depends, APIRouter, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 
 from src.config import auth_config
 from src.jwt import AuthHandler
-from src.schemas.auth import AuthRequestSchema
 
 router = APIRouter(tags=["Authorization Endpoints"])
 
 @router.post("/token")
-async def login_for_access_token(form_data: AuthRequestSchema = Depends()):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     auth_handler = AuthHandler()
-    user = await auth_handler.authenticate_user(form_data.client_id, form_data.password)
+    user = await auth_handler.authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = auth_handler.create_access_token(data={"sub": user.username})

@@ -1,18 +1,20 @@
+from typing import TypeVar
+
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.errors import ConnectionFailure
 
-from src.config import db_config
 from src.logger import logger
+from src.config import db_config
 from src.repositories.mongo.base_crud import BaseMongoCRUD
 
+MongoCRUD = TypeVar('MongoCRUD', bound=BaseMongoCRUD)
 
-
-class MongoContext:
+class MongoContext[MongoCRUD]:
     """ Класс для работы с СУБД MongoDB """
 
     #: CRUD для взаимодействия с таблицей
-    crud: BaseMongoCRUD
+    crud: MongoCRUD
 
     #: Клиент СУБД
     client: MongoClient = MongoClient(db_config.db_url)
@@ -33,8 +35,12 @@ class MongoContext:
     def __init__(self, *,
                  client: MongoClient | None = None,
                  db_name: str = db_config.db_name,
-                 collection_name: str):
+                 crud: MongoCRUD
+                 ):
         if client:
             self.client = client
+
         self.db: Database = self.client[db_name]
-        self.crud = BaseMongoCRUD(self.db, collection_name)
+
+        self.crud = crud
+        self.crud.db = self.db

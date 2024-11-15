@@ -25,7 +25,9 @@ class DBConfig(BaseSettings):
 
     @property
     def db_url(self):
-        return f"{self.driver}://{self.username}:{self.password}@{self.host}{f':{self.port}' if self.port else ''}/{self.db_name}"
+        db_url = f"{self.driver}://{self.username}:{self.password}@{self.host}{f':{self.port}' if self.port else ''}/{self.db_name}"
+        logger.debug("DB URL: %s", db_url)
+        return db_url
 
     model_config = SettingsConfigDict(env_prefix='DB_', extra="allow")
 

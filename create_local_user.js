@@ -10,3 +10,8 @@ db.createUser({
     { role: "readWrite", db: localDb }
   ]
 });
+
+db.users.insertOne({
+  username: "User",
+  hashed_password: "$2b$12$gTYpwFTkagvbEq69VpJ.6OOEqPM/P0Mazt3rrNtq5m3SipJgE92WO"
+});

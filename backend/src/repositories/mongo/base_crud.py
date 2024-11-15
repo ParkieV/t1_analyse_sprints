@@ -1,15 +1,24 @@
 from uuid import UUID
 
+from attrs import define
 from pymongo.database import Database
 from pymongo.collection import Collection
 
 from src.logger import logger
 
+@define
 class BaseMongoCRUD:
-    collection: Collection
+    """ Базовый класс для работы с коллекциями MongoDB """
 
-    def __init__(self, db: Database, collection_name: str) -> None:
-        self.collection = db[collection_name]
+    collection_name: str
+    db: Database | None = None
+
+    @property
+    def collection(self):
+        if self.db is None:
+            raise ValueError("Database is empty")
+        else:
+            return self.db[self.collection_name]
 
     async def get_object_by_id(self, object_id: UUID):
         try:
