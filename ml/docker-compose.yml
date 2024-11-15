@@ -1,31 +1,29 @@
-
 services:
   database:
     container_name: mongo
     image: mongo
     restart: unless-stopped
     env_file: .env
+    # Надо закрыть порты при выкатке решения, я их открыл чтобы чекать че в бд лежит через vs code
+    ports:
+      - 27017:27017
     environment:
       MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
       - db_data:/data/db
 
-  # Если ты будешь собирать статику, то добавь эти три строчке в конце своего docker-файла
-  # RUN npm run build
-  # FROM caddy:2-alpine as serve
-  # COPY --from=build /app/build /srv
-  frontend:
-      restart: unless-stopped
-      build:
-        context: frontend
-        dockerfile: Dockerfile
-      cap_add: NET_ADMIN
-      ports: [ 80:80, 443:443 ]
-      volumes:
-        - ./Caddyfile:/etc/caddy/Caddyfile
-        - caddy_data:/data
-        - caddy_config:/config
-      env_file: .env
+  ml_webserver:
+    build:
+      context: /
+    container_name: ml
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      HOST: ml
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
 
 volumes:
   db_data:
