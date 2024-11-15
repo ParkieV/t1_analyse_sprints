@@ -12,14 +12,14 @@ services:
 
   backend:
     restart: unless-stopped
+    build:
+      context: backend
+      dockerfile: Dockerfile
     env_file: .env
     environment:
       APP_PORT: ${BACKEND_PORT}
       APP_HOST: ${BACKEND_HOST}
     ports: [ "8080:${BACKEND_PORT}" ]
-    build:
-      context: backend
-      dockerfile: Dockerfile
     depends_on:
       database:
         condition: service_started

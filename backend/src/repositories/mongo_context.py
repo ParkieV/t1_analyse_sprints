@@ -14,13 +14,25 @@ class MongoContext[MongoCRUD]:
     """ Класс для работы с СУБД MongoDB """
 
     #: CRUD для взаимодействия с таблицей
-    crud: MongoCRUD
+    _crud: MongoCRUD | None = None
 
     #: Клиент СУБД
     client: MongoClient = MongoClient(db_config.db_url)
 
     #: База данных
     db: Database
+
+    @property
+    def crud(self) -> MongoCRUD:
+        if self._crud:
+            return self._crud
+        else:
+            raise ValueError('CRUD object has not been initialized')
+
+    @crud.setter
+    def crud(self, crud: MongoCRUD):
+        self._crud = crud
+        self._crud.db = self.db
 
     @classmethod
     def check_connection(cls):
@@ -35,12 +47,13 @@ class MongoContext[MongoCRUD]:
     def __init__(self, *,
                  client: MongoClient | None = None,
                  db_name: str = db_config.db_name,
-                 crud: MongoCRUD
+                 crud: MongoCRUD | None = None,
                  ):
         if client:
             self.client = client
 
         self.db: Database = self.client[db_name]
 
-        self.crud = crud
-        self.crud.db = self.db
+        if crud:
+            self._crud = crud
+            self._crud.db = self.db

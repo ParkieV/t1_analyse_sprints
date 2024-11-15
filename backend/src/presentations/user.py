@@ -1,29 +1,17 @@
-from fastapi import Depends, APIRouter, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt, JWTError
+from fastapi import Depends, APIRouter, HTTPException, status
 
-from src.config import auth_config
-from src.jwt import AuthHandler
+from src.repositories.mongo import UsersCRUD
+from src.repositories.mongo_context import MongoContext
+from src.schemas.user import UserOutDTO
+from src.services.utils import check_token
 
 router = APIRouter(tags=["Authorization Endpoints"])
 
-@router.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    auth_handler = AuthHandler()
-    user = await auth_handler.authenticate_user(form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    access_token = auth_handler.create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/users/me")
-async def read_users_me(token: str = Depends(AuthHandler.oauth2_scheme)):
-    credentials_exception = HTTPException(status_code=401, detail="Could not validate credentials")
+@router.get("/users/{username}", response_model=UserOutDTO, dependencies=[Depends(check_token)])
+async def read_user_info(username: str):
+    db_context = MongoContext[UsersCRUD](crud=UsersCRUD())
     try:
-        payload = jwt.decode(token, auth_config.secret_key, algorithms=[auth_config.algorithm])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    return {"username": username}
+        return await db_context.crud.get_object_by_username(username)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
