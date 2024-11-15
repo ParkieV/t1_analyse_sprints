@@ -1,0 +1,22 @@
+@import "variables";
+
+a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12px 4px 12px 8px;
+  gap: 12px;
+  height: 48px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: $black;
+  user-select: none;
+  text-decoration: none;
+
+  &:hover, &.active {
+    background: $accentColorLight;
+    color: $accentColor;
+  }
+}

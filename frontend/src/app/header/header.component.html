@@ -1,0 +1,8 @@
+<mat-form-field>
+    <mat-label>Компания</mat-label>
+    <mat-select [(ngModel)]="company">
+        @for (company of companies; track $index) {
+            <mat-option [value]="company">{{ company.name }}</mat-option>
+        }
+    </mat-select>
+</mat-form-field>
