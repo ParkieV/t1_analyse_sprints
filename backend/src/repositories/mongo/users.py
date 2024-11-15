@@ -6,7 +6,7 @@ from src.schemas.user import UserDBOutDTO
 
 
 @define
-class UserCRUD(BaseMongoCRUD):
+class UsersCRUD(BaseMongoCRUD):
     """ Класс для работы с коллекцией 'user' """
 
     collection_name: str = 'users'

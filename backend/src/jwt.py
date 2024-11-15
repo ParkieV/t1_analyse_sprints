@@ -6,17 +6,17 @@ from passlib.context import CryptContext
 
 from src.config import auth_config
 from src.logger import logger
-from src.repositories.mongo import UserCRUD
+from src.repositories.mongo import UsersCRUD
 from src.repositories.mongo_context import MongoContext
 
 
 class AuthHandler:
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
     _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     _auth_config = auth_config
 
-    db_context = MongoContext[UserCRUD](crud=UserCRUD())
+    db_context = MongoContext[UsersCRUD](crud=UsersCRUD())
 
     @classmethod
     def create_access_token(cls, data: dict, expires_delta: timedelta = None):
