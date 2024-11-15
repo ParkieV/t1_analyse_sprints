@@ -3,12 +3,26 @@ services:
   database:
     container_name: mongo
     image: mongo
+    platform: linux/arm64
     restart: unless-stopped
     env_file: .env
     environment:
       MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
       - db_data:/data/db
+
+  backend:
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_PORT: ${BACKEND_PORT}
+      APP_HOST: ${BACKEND_HOST}
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    depends_on:
+      database:
+        condition: service_started
 
   # Если ты будешь собирать статику, то добавь эти три строчке в конце своего docker-файла
   # RUN npm run build
@@ -19,7 +33,7 @@ services:
       build:
         context: frontend
         dockerfile: Dockerfile
-      cap_add: NET_ADMIN
+      cap_add: [ NET_ADMIN ]
       ports: [ 80:80, 443:443 ]
       volumes:
         - ./Caddyfile:/etc/caddy/Caddyfile
