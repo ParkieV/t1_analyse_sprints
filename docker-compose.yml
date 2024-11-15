@@ -24,22 +24,19 @@ services:
       database:
         condition: service_started
 
-  # Если ты будешь собирать статику, то добавь эти три строчке в конце своего docker-файла
-  # RUN npm run build
-  # FROM caddy:2-alpine as serve
-  # COPY --from=build /app/build /srv
   frontend:
-      restart: unless-stopped
-      build:
-        context: frontend
-        dockerfile: Dockerfile
-      cap_add: [ NET_ADMIN ]
-      ports: [ 80:80, 443:443 ]
-      volumes:
-        - ./Caddyfile:/etc/caddy/Caddyfile
-        - caddy_data:/data
-        - caddy_config:/config
-      env_file: .env
+    container_name: frontend
+    restart: unless-stopped
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    cap_add: [ NET_ADMIN ]
+    ports: [ 80:80, 443:443 ]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    env_file: .env
 
 volumes:
   db_data:
