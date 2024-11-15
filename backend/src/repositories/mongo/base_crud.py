@@ -4,7 +4,6 @@ from uuid import UUID
 
 from attrs import define
 from pymongo.database import Database
-from pymongo.collection import Collection
 
 from src.logger import logger
 

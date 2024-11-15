@@ -1,29 +1,17 @@
-from doctest import debug
-
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
 import pandas as pd
-from jose import jwt, JWTError
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
 
-from src.config import auth_config
-from src.jwt import AuthHandler
 from src.logger import logger
+from src.services.utils import check_token
+from src.repositories.mongo import EntitiesCRUD
 from src.services.parse_data import add_data_to_db
+from src.repositories.mongo_context import MongoContext
 
 router = APIRouter(prefix="/data", tags=["Data endpoints"])
 
 
-@router.post("/upload")
-async def upload_file(file: UploadFile = File(...),
-                      token: str = Depends(AuthHandler.oauth2_scheme)):
-    credentials_exception = HTTPException(status_code=401, detail="Could not validate credentials")
-    try:
-        payload = jwt.decode(token, auth_config.secret_key, algorithms=[auth_config.algorithm])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-
+@router.post("/upload", dependencies=[Depends(check_token)], status_code=status.HTTP_201_CREATED)
+async def upload_file(file: UploadFile = File(...)):
     try:
         skip_first_row: bool = ('Table' in str(file.file.readline()))
 
@@ -58,3 +46,25 @@ async def upload_file(file: UploadFile = File(...),
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Could not read this file')
 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Loading data failed')
+
+
+@router.get('/entities', dependencies=[Depends(check_token)])
+async def get_entities(page_number: int,
+                       page_size: int = 15):
+
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_objects((page_number - 1) * page_size, page_size)
+
+
+@router.get('/histories', dependencies=[Depends(check_token)])
+async def get_entities(page_number: int,
+                       page_size: int = 15):
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_objects((page_number - 1) * page_size, page_size)
+
+
+@router.get('/sprints', dependencies=[Depends(check_token)])
+async def get_entities(page_number: int,
+                       page_size: int = 15):
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_objects((page_number - 1) * page_size, page_size)
