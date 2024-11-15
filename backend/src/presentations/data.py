@@ -2,8 +2,9 @@ import pandas as pd
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
 
 from src.logger import logger
+from src.schemas.data import EntitiesOutDTO, HistoriesOutDTO, SprintsOutDTO
 from src.services.utils import check_token
-from src.repositories.mongo import EntitiesCRUD
+from src.repositories.mongo import EntitiesCRUD, SprintsCRUD, HistoriesCRUD
 from src.services.parse_data import add_data_to_db
 from src.repositories.mongo_context import MongoContext
 
@@ -53,18 +54,18 @@ async def get_entities(page_number: int,
                        page_size: int = 15):
 
     db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
-    return await db_context.crud.get_objects((page_number - 1) * page_size, page_size)
+    return await db_context.crud.get_objects(EntitiesOutDTO, (page_number - 1) * page_size, page_size)
 
 
 @router.get('/histories', dependencies=[Depends(check_token)])
 async def get_entities(page_number: int,
                        page_size: int = 15):
-    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
-    return await db_context.crud.get_objects((page_number - 1) * page_size, page_size)
+    db_context = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+    return await db_context.crud.get_objects(HistoriesOutDTO, (page_number - 1) * page_size, page_size)
 
 
 @router.get('/sprints', dependencies=[Depends(check_token)])
 async def get_entities(page_number: int,
                        page_size: int = 15):
-    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
-    return await db_context.crud.get_objects((page_number - 1) * page_size, page_size)
+    db_context = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+    return await db_context.crud.get_objects(SprintsOutDTO, (page_number - 1) * page_size, page_size)

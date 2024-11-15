@@ -1,11 +1,15 @@
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, TypeVar
 from uuid import UUID
 
 from attrs import define
 from pymongo.database import Database
 
 from src.logger import logger
+from src.schemas.user import CustomBaseModel
+
+
+SchemaOut = TypeVar("SchemaOut", bound=CustomBaseModel)
 
 @define
 class BaseMongoCRUD:
@@ -30,7 +34,7 @@ class BaseMongoCRUD:
 
         return mongo_object
 
-    async def get_objects(self, offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
+    async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
         try:
             objects = self.collection.find()
             if offset is not None:
@@ -41,7 +45,7 @@ class BaseMongoCRUD:
             logger.error(f"Failed to find objects. {e.__class__.__name__}: {e}", )
             raise
 
-        return objects.to_list()
+        return [out_schema(**db_object) for db_object in objects.to_list()]
 
     async def insert_objects(self, data: Sequence[Mapping[str, Any]]) -> None:
         try:

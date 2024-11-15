@@ -1,3 +1,4 @@
+import json
 from typing import Literal
 
 from src.logger import logger
@@ -21,6 +22,9 @@ async def add_data_to_db(data, data_type: Literal['entities', 'histories', 'spri
 
     elif data_type == 'sprints':
         logger.info('Data about sprints')
+        for row in data:
+            row['entity_ids'] = [int(x) for x in row["entity_ids"].strip('{}').split(',')]
+
         db_context.crud = SprintsCRUD()
         logger.debug('Inserting sprints')
         await db_context.crud.insert_objects(data)

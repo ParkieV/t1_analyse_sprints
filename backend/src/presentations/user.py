@@ -2,13 +2,13 @@ from fastapi import Depends, APIRouter, HTTPException, status
 
 from src.repositories.mongo import UsersCRUD
 from src.repositories.mongo_context import MongoContext
-from src.schemas.user import UserDBOutDTO
+from src.schemas.user import UserOutDTO
 from src.services.utils import check_token
 
 router = APIRouter(tags=["Authorization Endpoints"])
 
 
-@router.get("/users/{username}", response_model=UserDBOutDTO, dependencies=[Depends(check_token)])
+@router.get("/users/{username}", response_model=UserOutDTO, dependencies=[Depends(check_token)])
 async def read_user_info(username: str):
     db_context = MongoContext[UsersCRUD](crud=UsersCRUD())
     try:
