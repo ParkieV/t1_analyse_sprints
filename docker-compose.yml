@@ -6,10 +6,9 @@ services:
     platform: linux/arm64
     restart: unless-stopped
     env_file: .env
-    environment:
-      MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
       - db_data:/data/db
+      - ./create_local_user.js:/docker-entrypoint-initdb.d/create_local_user.js
 
   backend:
     restart: unless-stopped
@@ -17,6 +16,7 @@ services:
     environment:
       APP_PORT: ${BACKEND_PORT}
       APP_HOST: ${BACKEND_HOST}
+
     build:
       context: backend
       dockerfile: Dockerfile
