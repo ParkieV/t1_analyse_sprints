@@ -1,5 +1,6 @@
 import math
 from datetime import datetime
+from typing import Optional
 
 from pydantic import field_validator, model_validator
 
@@ -27,6 +28,7 @@ class HistoriesOutDTO(CustomBaseModel):
 class EntitiesOutDTO(CustomBaseModel):
     entity_id: int | None
     area: str | None
+    "Задача, Подзадача, Дефект, История"
     type: str | None
     status: str | None
     state: str | None
@@ -66,8 +68,9 @@ class SprintBaseDTO(CustomBaseModel):
     sprint_start_date: datetime | None
     sprint_end_date: datetime | None
 
-class SprintsOutDTO(SprintBaseDTO):
-    entity_ids: list[int] | None
+class SprintListOutDTO(SprintBaseDTO):
+    progress: float | None
+    update_date: Optional[datetime] | None
 
 class SprintOutDTO(SprintBaseDTO):
-    entity_ids: list[EntitiesOutDTO] | None
+    entities: list[EntitiesOutDTO] | None

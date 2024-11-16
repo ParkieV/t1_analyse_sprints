@@ -22,7 +22,7 @@ class SprintsCRUD(BaseMongoCRUD):
     async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
         return await self._get_objects(out_schema, offset, limit)
 
-    async def get_object_by_id(self, object_id: ObjectId, entity_getting_func: AsyncFunc) -> SprintOutDTO:
+    async def get_object_by_id(self, object_id: ObjectId) -> dict:
         logger.info('Start finding sprint')
         try:
             sprint = self.collection.find_one({'_id': object_id})
@@ -30,9 +30,4 @@ class SprintsCRUD(BaseMongoCRUD):
             logger.error(f"Failed to find object by id. {e.__class__.__name__}: {e}", )
             raise
         logger.info('Sprint found successfully')
-
-        logger.info('Started preparing sprint model')
-        if entities := sprint.get('entity_ids'):
-            sprint['entity_ids'] = [await entity_getting_func(entity) for entity in entities]
-        logger.info('Sprint model prepared successfully')
-        return SprintOutDTO(**sprint)
+        return sprint
