@@ -1,0 +1,25 @@
+@import "variables";
+
+.value {
+  margin-right: 16px;
+  line-height: 38px;
+}
+
+.card {
+  flex-direction: column;
+  height: 105px;
+  justify-content: space-between;
+}
+
+.content {
+  display: flex;
+  align-items: flex-end;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+.green {
+  color: $greenText;
+}

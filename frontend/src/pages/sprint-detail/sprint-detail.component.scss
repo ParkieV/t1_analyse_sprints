@@ -1,0 +1,43 @@
+@import "variables";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+
+  .tab-marker {
+    width: 8px;
+    height: 8px;
+    background: rgba(13, 35, 37, 0.7);
+    opacity: 0.3;
+    border-radius: 12px;
+  }
+
+  &:hover:not(.tab--active) {
+    background: rgba(13, 35, 37, 0.03);
+
+    .tab-marker {
+      opacity: 1;
+    }
+  }
+}
+
+.tab--active {
+  .tab-marker {
+    background: $dark1;
+    opacity: 1;
+  }
+  cursor: default;
+}

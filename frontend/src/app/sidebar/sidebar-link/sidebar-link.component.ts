@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
   styleUrl: './sidebar-link.component.scss'
 })
 export class SidebarLinkComponent {
-  @Input({ required: true }) routerLink!: string;
+  @Input() routerLink?: string;
 
   @Input() exact = false;
 }
