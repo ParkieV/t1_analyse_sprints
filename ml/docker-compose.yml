@@ -1,6 +1,6 @@
 services:
-  database:
-    container_name: mongo
+  database_ml:
+    container_name: mongo_ml
     image: mongo
     restart: unless-stopped
     env_file: .env
@@ -10,22 +10,22 @@ services:
     environment:
       MONGO_INITDB_DATABASE: ${DB_NAME}
     volumes:
-      - db_data:/data/db
+      - db_ml_data:/data/db
 
   ml_webserver:
     build:
       context: /
-    container_name: ml
+    container_name: ml_local
     restart: unless-stopped
     env_file: .env
     environment:
       HOST: ml
     ports:
-      - 8000:8000
+      - 8000:8010
     depends_on:
-      - database
+      - database_ml
 
 volumes:
-  db_data:
+  db_ml_data:
   caddy_data:
   caddy_config:

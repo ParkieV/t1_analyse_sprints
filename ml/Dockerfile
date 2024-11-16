@@ -1,4 +1,4 @@
-FROM python:3.10-slim as base
+FROM python:3.10-slim AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -13,8 +13,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-COPY API .
+FROM base AS base_with_req
 
-EXPOSE 8000
+COPY API .
 
 CMD ["python", "main.py"]
