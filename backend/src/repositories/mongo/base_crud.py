@@ -1,8 +1,10 @@
+from abc import abstractmethod
 from collections.abc import Mapping, Sequence
 from typing import Any, TypeVar
 from uuid import UUID
 
 from attrs import define
+from bson import ObjectId
 from pymongo.database import Database
 
 from src.logger import logger
@@ -25,14 +27,18 @@ class BaseMongoCRUD:
         else:
             return self.db[self.collection_name]
 
-    async def get_object_by_id(self, object_id: UUID) -> Mapping[str, Any]:
+    async def _get_object_by_id(self, object_id: str) -> Mapping[str, Any]:
         try:
-            mongo_object = self.collection.find_one({'_id': object_id})
+            mongo_object = self.collection.find_one({'_id': ObjectId(object_id)})
         except Exception as e:
             logger.error(f"Failed to find object by id. {e.__class__.__name__}: {e}", )
             raise
 
         return mongo_object
+
+    @abstractmethod
+    async def get_object_by_id(self, *args, **kwargs) -> Any:
+        pass
 
     async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
         try:

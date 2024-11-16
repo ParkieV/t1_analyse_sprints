@@ -3,6 +3,7 @@ from datetime import datetime
 
 from pydantic import field_validator, model_validator
 
+from src.logger import logger
 from src.schemas.user import CustomBaseModel
 
 
@@ -28,6 +29,12 @@ class EntitiesOutDTO(CustomBaseModel):
     spent: int | None
     workgroup: str | None
     resolution: str | None
+
+    @field_validator("due_date", mode="before")
+    def convert_datetime(cls, value):
+        if (value is None) or isinstance(value, datetime):
+            return value
+        return datetime.strptime(value, "%m/%d/%y")
 
     @model_validator(mode="before")
     def handle_nan(cls, values):
@@ -58,3 +65,10 @@ class SprintsOutDTO(CustomBaseModel):
     sprint_start_date: datetime | None
     sprint_end_date: datetime | None
     entity_ids: list[int] | None
+
+class SprintOutDTO(CustomBaseModel):
+    sprint_name: str | None
+    sprint_status: str | None
+    sprint_start_date: datetime | None
+    sprint_end_date: datetime | None
+    entity_ids: list[EntitiesOutDTO] | None
