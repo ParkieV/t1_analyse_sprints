@@ -5,3 +5,20 @@
     justify-content: space-between;
     align-items: center;
 }
+
+::ng-deep {
+    mat-form-field.select-form-field {
+      .mat-mdc-text-field-wrapper.mdc-text-field {
+        background: #fff !important;
+        border-radius: 15px !important;
+      }
+  
+      .mdc-line-ripple {
+        display: none;
+      }
+  
+      .mat-mdc-form-field-subscript-wrapper.mat-mdc-form-field-bottom-align {
+        display: none;
+      }
+    }
+  }

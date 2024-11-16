@@ -1,0 +1,10 @@
+{
+  "sprints": {
+    "nameCell": "Название",
+    "statusCell": "Статус",
+    "progressCell": "Прогресс",
+    "projectCell": "Проект",
+    "lastChangesCell": "Последние изменения",
+    "more": "Подробнее"
+  }
+}

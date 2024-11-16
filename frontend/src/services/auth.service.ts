@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/user.company';
 import { delay, Observable, of, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +12,7 @@ export class AuthService {
 
   authorizedUser?: User;
 
-  constructor() {
+  constructor(private _apiService: ApiService) {
     this._checkIsAuthorized();
   }
 
@@ -26,10 +28,14 @@ export class AuthService {
   }
 
   public signIn(username: string, password: string): Observable<void> {
-    return of()
-      .pipe(delay(1000))
+    return this._apiService
+      .post('auth/token', {
+        username: username,
+        password: password,
+      })
       .pipe(
-        tap(() => {
+        tap((res) => {
+          debugger;
           this.isLogged = true;
           this.authorizedUser = {
             id: 1,
