@@ -7,5 +7,5 @@ COPY . .
 RUN npm run build
 
 #STAGE 2
-FROM caddy:2-alpine as serve
+FROM caddy:2-alpine AS serve
 COPY --from=build /usr/src/app/dist/t1/browser /srv

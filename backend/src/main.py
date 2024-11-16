@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     MongoContext.check_connection()
     yield
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, root_path="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],

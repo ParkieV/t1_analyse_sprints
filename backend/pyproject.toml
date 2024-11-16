@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["ParkieV <st-psk@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.5"
+pydantic = "^2.9.2"
+email-validator = "^2.2.0"
+pydantic-settings = "^2.6.1"
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+colorlog = "^6.9.0"
+attrs = "^24.2.0"
+pymongo = "^4.10.1"
+python-multipart = "^0.0.17"
+bcrypt = "3.1.7"
+pandas = "^2.2.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
