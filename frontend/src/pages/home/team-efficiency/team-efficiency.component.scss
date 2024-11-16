@@ -1,0 +1,12 @@
+.content {
+    display: flex;
+    align-items: center;
+}
+
+.titles {
+    flex: 1;
+}
+
+app-team-efficiency-chart {
+    flex: 2;
+}

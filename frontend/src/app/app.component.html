@@ -1,11 +1,17 @@
 <app-sidebar></app-sidebar>
 
-<div class="content">
 
-  <app-header></app-header>
-  
-  <main> 
-    <router-outlet />
-  </main>
-  
+
+
+<div class="content">
+    <ng-scrollbar>
+    
+    <app-header></app-header>
+    
+    <main> 
+      <router-outlet />
+    </main>
+    
+    
+  </ng-scrollbar>
 </div>

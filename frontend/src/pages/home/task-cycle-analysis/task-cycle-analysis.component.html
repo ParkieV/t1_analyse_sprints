@@ -1,0 +1,18 @@
+<div class="card">
+  <h3 class="h8">Анализ цикла задач</h3>
+
+  <div class="card-title">{{ title }}</div>
+
+  <div class="card-subtitle">{{ subtitle }}</div>
+
+  <app-task-cycle-analysis-chart
+    [color]="activeOption.color"
+    [dataSeries]="activeOption.dataSeries"
+  ></app-task-cycle-analysis-chart>
+
+  <div class="option-container">
+    @for (option of options; track $index) {
+        <app-task-cycle-analysis-option [active]="option === activeOption" [settings]="option" (click)="activeOption = option"></app-task-cycle-analysis-option>
+    }
+  </div>
+</div>

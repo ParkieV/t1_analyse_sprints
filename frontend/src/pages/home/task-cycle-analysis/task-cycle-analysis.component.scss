@@ -1,0 +1,9 @@
+.option-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+app-task-cycle-analysis-option {
+    width: 100%;
+}
