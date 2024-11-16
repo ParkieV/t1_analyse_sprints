@@ -22,7 +22,7 @@ class EntitiesCRUD(BaseMongoCRUD):
     async def get_object_by_id(self, object_id: int) -> EntitiesOutDTO:
         logger.info('Start finding entity')
         try:
-            entity = self.collection.find_one({'entity_id': object_id})
+            entity = await self.collection.find_one({'entity_id': object_id})
         except Exception as e:
             logger.error(f"Failed to find object by id. {e.__class__.__name__}: {e}", )
             raise
@@ -50,3 +50,18 @@ class EntitiesCRUD(BaseMongoCRUD):
         except Exception as e:
             logger.error(f"Failed to fetch unique areas. {e.__class__.__name__}: {e}")
             raise
+
+    async def get_object_by_id_histories(self, object_id: int, history_get_func: AsyncSeqFunc) -> EntityOutDTO:
+        logger.info('Start finding entity')
+        try:
+            entity = await self.collection.find_one({'entity_id': object_id})
+        except Exception as e:
+            logger.error(f"Failed to find object by id. {e.__class__.__name__}: {e}", )
+            raise
+        logger.info('Entity found successfully')
+
+        logger.info('Started preparing entity model')
+        entity['history_ids'] = await history_get_func(object_id)
+        logger.info('Entity model prepared successfully')
+
+        return EntityOutDTO(**entity)

@@ -25,7 +25,7 @@ class SprintsCRUD(BaseMongoCRUD):
     async def get_object_by_id(self, object_id: ObjectId) -> dict:
         logger.info('Start finding sprint')
         try:
-            sprint = self.collection.find_one({'_id': object_id})
+            sprint = await self.collection.find_one({'_id': object_id})
         except Exception as e:
             logger.error(f"Failed to find object by id. {e.__class__.__name__}: {e}", )
             raise

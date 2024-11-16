@@ -1,8 +1,7 @@
 from typing import TypeVar
 
-from pymongo import MongoClient
-from pymongo.database import Database
 from pymongo.errors import ConnectionFailure
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from src.logger import logger
 from src.config import db_config
@@ -17,10 +16,10 @@ class MongoContext[MongoCRUD]:
     _crud: MongoCRUD | None = None
 
     #: Клиент СУБД
-    client: MongoClient = MongoClient(db_config.db_url)
+    client: AsyncIOMotorClient = AsyncIOMotorClient(db_config.db_url)
 
     #: База данных
-    db: Database
+    db: AsyncIOMotorDatabase
 
     @property
     def crud(self) -> MongoCRUD:
@@ -45,14 +44,14 @@ class MongoContext[MongoCRUD]:
             raise ConnectionFailure("Connection to MongoDB failed!")
 
     def __init__(self, *,
-                 client: MongoClient | None = None,
+                 client: AsyncIOMotorClient | None = None,
                  db_name: str = db_config.db_name,
                  crud: MongoCRUD | None = None,
                  ):
         if client:
             self.client = client
 
-        self.db: Database = self.client[db_name]
+        self.db: AsyncIOMotorDatabase = self.client[db_name]
 
         if crud:
             self._crud = crud
