@@ -1,11 +1,16 @@
-from typing import Any
+from collections.abc import Callable, Coroutine, Sequence
+from typing import TypeVar, ParamSpec
 
 from attrs import define
 
 from src.logger import logger
 from src.repositories.mongo.base_crud import BaseMongoCRUD
-from src.schemas.data import EntitiesOutDTO
+from src.schemas.data import EntitiesOutDTO, EntityOutDTO
+from src.schemas.user import CustomBaseModel
 
+T = TypeVar("T", bound=CustomBaseModel)
+P = ParamSpec("P")
+AsyncSeqFunc = Callable[P, Coroutine[None, None, Sequence[T]]]
 
 @define
 class EntitiesCRUD(BaseMongoCRUD):
@@ -23,3 +28,18 @@ class EntitiesCRUD(BaseMongoCRUD):
         logger.info('Found entity successfully')
 
         return EntitiesOutDTO(**entity)
+
+    async def get_object_by_id_histories(self, object_id: int, history_get_func: AsyncSeqFunc) -> EntityOutDTO:
+        logger.info('Start finding entity')
+        try:
+            entity = self.collection.find_one({'entity_id': object_id})
+        except Exception as e:
+            logger.error(f"Failed to find object by id. {e.__class__.__name__}: {e}", )
+            raise
+        logger.info('Entity found successfully')
+
+        logger.info('Started preparing entity model')
+        entity['history_ids'] = await history_get_func(object_id)
+        logger.info('Entity model prepared successfully')
+
+        return EntityOutDTO(**entity)

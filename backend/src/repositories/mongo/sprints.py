@@ -11,6 +11,7 @@ from src.schemas.user import CustomBaseModel
 
 T = TypeVar("T", bound=CustomBaseModel)
 P = ParamSpec("P")
+AsyncFunc = Callable[P, Coroutine[None, None, T]]
 
 @define
 class SprintsCRUD(BaseMongoCRUD):
@@ -18,7 +19,7 @@ class SprintsCRUD(BaseMongoCRUD):
 
     collection_name: str = 'sprints'
 
-    async def get_object_by_id(self, object_id: ObjectId, entity_getting_func: Callable[P, Coroutine[None, None, T]]) -> SprintOutDTO:
+    async def get_object_by_id(self, object_id: ObjectId, entity_getting_func: AsyncFunc) -> SprintOutDTO:
         logger.info('Start finding sprint')
         try:
             sprint = self.collection.find_one({'_id': object_id})

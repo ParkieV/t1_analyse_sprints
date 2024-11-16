@@ -1,3 +1,5 @@
+from typing import Any
+
 from attrs import define
 
 from src.logger import logger
@@ -10,6 +12,9 @@ class UsersCRUD(BaseMongoCRUD):
     """ Класс для работы с коллекцией 'user' """
 
     collection_name: str = 'users'
+
+    async def get_object_by_id(self, object_id: str) -> Any:
+        return await self._get_object_by_id(object_id)
 
     async def get_object_by_username(self, username: str) -> UserOutDTO:
         try:

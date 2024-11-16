@@ -13,6 +13,7 @@ class CustomBaseModel(BaseModel):
             return str(value)
         return value
 
+
 class UserOutDTO(CustomBaseModel):
     username: str
     hashed_password: str

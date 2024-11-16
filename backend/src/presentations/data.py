@@ -57,6 +57,13 @@ async def get_entities(page_number: int,
     db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     return await db_context.crud.get_objects(EntitiesOutDTO, (page_number - 1) * page_size, page_size)
 
+@router.get('/entities/{entity_id}', dependencies=[Depends(check_token)])
+async def get_sprint(entity_id: int):
+    db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    db_context_histories = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+
+    return await db_context_entities.crud.get_object_by_id_histories(entity_id, db_context_histories.crud.get_object_by_entity_id)
+
 
 @router.get('/histories', dependencies=[Depends(check_token)])
 async def get_entities(page_number: int,
