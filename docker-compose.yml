@@ -5,6 +5,8 @@ services:
     platform: linux/arm64
     restart: unless-stopped
     env_file: .env
+    ports:
+      - 27017:27017
     volumes:
       - db_data:/data/db
       - ./create_local_user.js:/docker-entrypoint-initdb.d/create_local_user.js
@@ -32,6 +34,8 @@ services:
     environment:
       APP_PORT: ${BACKEND_PORT}
       APP_HOST: ${BACKEND_HOST}
+    ports:
+      - 8010:8010
     depends_on:
       database:
         condition: service_started
@@ -42,11 +46,14 @@ services:
     container_name: ml
     restart: unless-stopped
     env_file: .env
+    environment:
+      ML_PORT: '8000'
+      ML_HOST: 'ml'
     build:
       context: ml
       dockerfile: Dockerfile
-    environment:
-      - HOST = 0.0.0.0
+    ports:
+      - 8000:8000
     depends_on:
       database:
         condition: service_started

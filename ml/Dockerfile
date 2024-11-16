@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS base
+FROM python:3.12.7-slim AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -15,6 +15,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 FROM base AS base_with_req
 
-COPY API .
+COPY . .
 
-CMD ["python", "main.py"]
+CMD ["python", "-m", "src.main"]
