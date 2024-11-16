@@ -1,7 +1,7 @@
 services:
   database:
     image: mongo
-    platform: linux/arm64
+    container_name: mongo
     restart: unless-stopped
     env_file: .env
     ports:
@@ -10,41 +10,32 @@ services:
       - db_data:/data/db
       - ./create_local_user.js:/docker-entrypoint-initdb.d/create_local_user.js
 
-  frontend:
-    restart: unless-stopped
-    build:
-      context: frontend
-      dockerfile: Dockerfile
-    cap_add: [ NET_ADMIN ]
-    ports: [ 80:80 ]
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    env_file: .env
-
   backend:
+    container_name: backend
     restart: unless-stopped
     build:
       context: backend
       dockerfile: Dockerfile
+    ports:
+      - 8010:8010
     env_file: .env
     depends_on:
       database:
         condition: service_started
-      frontend:
-        condition: service_started
 
   ml:
+    container_name: ml
     restart: unless-stopped
     env_file: .env
     build:
       context: ml
       dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      ML_HOST: ${ML_HOST}
     depends_on:
       database:
-        condition: service_started
-      frontend:
         condition: service_started
 
 volumes:
