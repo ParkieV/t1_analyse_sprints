@@ -2,7 +2,6 @@ from collections.abc import Mapping
 from typing import Any
 
 from attrs import define
-from pyasn1.type.univ import Sequence
 
 from src.logger import logger
 from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
