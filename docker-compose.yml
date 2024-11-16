@@ -19,7 +19,6 @@ services:
     environment:
       APP_PORT: ${BACKEND_PORT}
       APP_HOST: ${BACKEND_HOST}
-    ports: [ "8080:${BACKEND_PORT}" ]
     depends_on:
       database:
         condition: service_started
