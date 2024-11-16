@@ -11,7 +11,7 @@ from src.repositories.mongo_context import MongoContext
 
 
 class AuthHandler:
-    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
     _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     _auth_config = auth_config
