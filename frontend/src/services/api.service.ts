@@ -80,12 +80,12 @@ export class ApiService {
       !options.headers.has('Content-Type') ||
       options.headers.get('Content-Type') === 'application/json'
     ) {
-      return keysToSnake(body);
+      return keysToSnake(body); 
     }
     return body;
   }
 
   static get apiUrl() {
-    return 'localhost:8080/api/';
+    return 'http://localhost/api/';
   }
 }

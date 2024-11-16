@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
+import { SprintsService } from '../../../services/sprints.service';
+import { Sprint } from '../../../models/sprint.model';
 
 @Component({
   selector: 'app-sprints-table',
@@ -21,5 +23,11 @@ export class SprintsTableComponent {
     'more',
   ];
 
-  dataSource = new MatTableDataSource<any>();
-}
+  dataSource = new MatTableDataSource<Sprint>();
+
+  constructor(private _sprintService: SprintsService) {
+    this._sprintService.getSprints().subscribe((res) => {
+      this.dataSource.data = res;
+    })
+  }
+} 

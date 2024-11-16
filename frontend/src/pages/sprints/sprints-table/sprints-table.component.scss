@@ -1,0 +1,75 @@
+@import "variables";
+
+.status {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 30px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.table-wrapper {
+  position: relative;
+}
+
+.header-background {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 56px;
+  border-radius: 15px;
+  background: $fieldPrimary;
+}
+
+.status--complete {
+  background: #e1f7e6;
+  color: #1e8b3b;
+}
+
+.mat-mdc-table {
+  background-color: transparent;
+}
+
+.mat-mdc-header-row {
+  background: transparent;
+}
+
+::ng-deep {
+}
+
+.mat-mdc-header-cell {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  border-bottom: none;
+}
+
+.mat-mdc-cell {
+  font-size: 16px;
+  line-height: 20px;
+  border-bottom-color: $dark5;
+}
+
+.mat-mdc-row {
+  height: 80px;
+}
+
+.more {
+  text-decoration: none;
+  padding: 12px;
+  background: $primary3;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  color: $white;
+
+  &:hover {
+    background: $primary2;
+  }
+}

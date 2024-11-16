@@ -1,61 +1,76 @@
 <div class="card">
-    
+  <div class="table-wrapper">
+    <div class="header-background"></div>
+
     <table class="table" #tableRef mat-table matSort [dataSource]="dataSource">
-        <ng-container matColumnDef="name">
-            <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'sprints.nameCell' | translate }}</th>
-            <td mat-cell *matCellDef="let sprint">
-                <div class="name-cell">
+      <ng-container matColumnDef="name">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>
+          {{ "sprints.nameCell" | translate }}
+        </th>
+        <td mat-cell *matCellDef="let sprint">
+          <div class="name-cell">
+            {{ sprint.sprintName }}
+          </div>
+        </td>
+      </ng-container>
 
-                </div>
-            </td>
-        </ng-container>
+      <ng-container matColumnDef="status">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>
+          {{ "sprints.statusCell" | translate }}
+        </th>
+        <td mat-cell *matCellDef="let sprint">
+          <div class="status status--complete">
+            {{ sprint.sprintStatus }}
+          </div>
+        </td>
+      </ng-container>
 
-        <ng-container matColumnDef="status">
-            <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'sprints.statusCell' | translate }}</th>
-            <td mat-cell *matCellDef="let sprint">
-                <div class="status-cell">
+      <ng-container matColumnDef="progress">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>
+          {{ "sprints.progressCell" | translate }}
+        </th>
+        <td mat-cell *matCellDef="let sprint">
+          <div class="progress-cell"></div>
+        </td>
+      </ng-container>
 
-                </div>
-            </td>
-        </ng-container>
-        
-        <ng-container matColumnDef="progress">
-            <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'sprints.progressCell' | translate }}</th>
-            <td mat-cell *matCellDef="let sprint">
-                <div class="progress-cell">
+      <ng-container matColumnDef="project">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>
+          {{ "sprints.projectCell" | translate }}
+        </th>
+        <td mat-cell *matCellDef="let sprint">
+          <div class="project-cell"></div>
+        </td>
+      </ng-container>
 
-                </div>
-            </td>
-        </ng-container>
-        
-        <ng-container matColumnDef="project">
-            <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'sprints.projectCell' | translate }}</th>
-            <td mat-cell *matCellDef="let sprint">
-                <div class="project-cell">
+      <ng-container matColumnDef="lastChanges">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>
+          {{ "sprints.lastChangesCell" | translate }}
+        </th>
+        <td mat-cell *matCellDef="let sprint">
+          <div class="last-changes-cell"></div>
+        </td>
+      </ng-container>
 
-                </div>
-            </td>
-        </ng-container>
-        
-        <ng-container matColumnDef="lastChanges">
-            <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'sprints.lastChangesCell' | translate }}</th>
-            <td mat-cell *matCellDef="let sprint">
-                <div class="last-changes-cell">
+      <ng-container matColumnDef="more">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let sprint">
+          <a class="more" [routerLink]="sprint.id">{{
+            "sprints.more" | translate
+          }}</a>
+        </td>
+      </ng-container>
 
-                </div>
-            </td>
-        </ng-container>
-        
-        <ng-container matColumnDef="more">
-            <th class="header-cell" mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let sprint">
-                <div class="actions-cell">
-                    <a [routerLink]="sprint.id">{{ 'sprints.more' | translate }}</a>
-                </div>
-            </td>
-        </ng-container>
-        
-        <tr class="table-header" mat-header-row *matHeaderRowDef="tableColumns; sticky: true"></tr>
-        <tr class="table-row" mat-row *matRowDef="let row; columns: tableColumns"></tr>
+      <tr
+        class="table-header"
+        mat-header-row
+        *matHeaderRowDef="tableColumns; sticky: true"
+      ></tr>
+      <tr
+        class="table-row"
+        mat-row
+        *matRowDef="let row; columns: tableColumns"
+      ></tr>
     </table>
+  </div>
 </div>

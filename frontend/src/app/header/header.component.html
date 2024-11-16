@@ -6,3 +6,14 @@
         }
     </mat-select>
 </mat-form-field>
+
+<div *ngIf="authService.isLogged" class="profile" [matMenuTriggerFor]="profileMenu">
+    <div class="profile-name">{{ authService.authorizedUser?.fullName }}</div>
+    <div [ngStyle]="{ backgroundImage: 'url(' + authService.authorizedUser?.photo + ')'}" class="profile-avatar"></div>
+</div>
+
+<button *ngIf="!authService.isLogged"  (click)="signIn()" class="sign-in" [ngClass]="{'sign-in--loading': isProfileLoading}" [disabled]="isProfileLoading">Войти</button>
+
+<mat-menu #profileMenu>
+    <button mat-menu-item (click)="signOut()">Выйти</button>
+</mat-menu>

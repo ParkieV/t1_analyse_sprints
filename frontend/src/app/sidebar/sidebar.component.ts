@@ -11,11 +11,5 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-  constructor(private _authService: AuthService) {}
   
-  signIn() {
-    return this._authService.signIn('User', 'Qwerty123.').subscribe((res) => {
-      debugger;
-    })
-  }
 }

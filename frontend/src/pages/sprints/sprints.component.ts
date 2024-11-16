@@ -10,5 +10,5 @@ import { SprintsTableComponent } from "./sprints-table/sprints-table.component";
   styleUrl: './sprints.component.scss'
 })
 export class SprintsComponent {
-
+  
 }
