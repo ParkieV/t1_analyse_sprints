@@ -19,6 +19,11 @@ BACKEND_ALLOW_CREDENTIALS = True
 BACKEND_ALLOW_METHODS = ["GET","POST","DELETE","PATCH","OPTIONS"]
 BACKEND_ALLOW_HEADERS = ["Access-Control-Allow-Origin","Authorization","User-Agent","Connection","Host","Content-Type","Accept","Accept-Encoding"]
 
+# Ml
+ML_PORT:=<ПОРТ_СЕРВЕРА>
+ML_HOST:=<ХОСТ_СЕРВЕРА>
+
+
 # Auth
 AUTH_SECRET_KEY=<СЕКРЕТНЫЙ_КЛЮЧ>
 AUTH_ALGORITHM=<АЛГОРИТМ_ХЭШИРОВАНИЯ><"HS256">
