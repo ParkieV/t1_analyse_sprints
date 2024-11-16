@@ -31,7 +31,7 @@ services:
       context: frontend
       dockerfile: Dockerfile
     cap_add: [ NET_ADMIN ]
-    ports: [ 80:80, 443:443 ]
+    ports: [ 80:80 ]
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data

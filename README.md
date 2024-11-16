@@ -23,4 +23,7 @@ BACKEND_ALLOW_HEADERS = ["Access-Control-Allow-Origin","Authorization","User-Age
 AUTH_SECRET_KEY=<СЕКРЕТНЫЙ_КЛЮЧ>
 AUTH_ALGORITHM=<АЛГОРИТМ_ХЭШИРОВАНИЯ><"HS256">
 AUTH_ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Frontend
+DOMAIN=<ДОМЕННОЕ_ИМЯ><:80>
 ```
