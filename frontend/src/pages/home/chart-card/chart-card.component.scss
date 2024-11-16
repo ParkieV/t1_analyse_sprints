@@ -1,0 +1,38 @@
+@import "variables";
+
+.increase {
+  color: $green;
+
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.decrease {
+  color: $red;
+
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.null {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.card {
+  flex-direction: column;
+  height: 126px;
+  justify-content: space-between;   
+}
+
+.content {
+  display: flex;
+  align-items: flex-end;
+}
+
+h2 {
+    margin-bottom: 16px;
+}

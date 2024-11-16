@@ -1,0 +1,9 @@
+.card-container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+app-chart-card {
+  flex: 1;
+}
