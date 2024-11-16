@@ -61,7 +61,6 @@ class SprintsCRUD(BaseMongoCRUD):
             sprint['entities']: list[T] = await entities_getting_func(entities)
         logger.info('Sprint model prepared successfully')
 
-        logger
         completed_count = sum(1 for entity in sprint['entities'] if entity.status in ("Завершено", "Закрыто"))
         total_count = len(sprint['entities'])
 
