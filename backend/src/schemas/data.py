@@ -28,7 +28,6 @@ class HistoriesOutDTO(CustomBaseModel):
 class EntitiesOutDTO(CustomBaseModel):
     entity_id: int | None
     area: str | None
-    "Задача, Подзадача, Дефект, История"
     type: str | None
     status: str | None
     state: str | None
@@ -67,10 +66,10 @@ class SprintBaseDTO(CustomBaseModel):
     sprint_status: str | None
     sprint_start_date: datetime | None
     sprint_end_date: datetime | None
-
-class SprintListOutDTO(SprintBaseDTO):
     progress: float | None
-    update_date: Optional[datetime] | None
+
+class SprintsOutDTO(SprintBaseDTO):
+    update_date: datetime | None
 
 class SprintOutDTO(SprintBaseDTO):
     entities: list[EntitiesOutDTO] | None

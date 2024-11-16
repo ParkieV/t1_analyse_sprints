@@ -11,7 +11,7 @@ from src.repositories.mongo_context import MongoContext
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.debug('1')
-    MongoContext.check_connection()
+    await MongoContext.check_connection()
     logger.debug('2')
     yield
 

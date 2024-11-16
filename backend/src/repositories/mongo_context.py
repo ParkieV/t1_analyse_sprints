@@ -34,10 +34,10 @@ class MongoContext[MongoCRUD]:
         self._crud.db = self.db
 
     @classmethod
-    def check_connection(cls):
+    async def check_connection(cls):
         logger.info("Try to connect to MongoDB")
         try:
-            cls.client.admin.command('ping')
+            await cls.client.admin.command('ping')
             logger.info("Connection to MongoDB is successful!")
         except Exception as e:
             logger.error(f"Connection to MongoDB failed: {e.__class__.__name__} - {e}")

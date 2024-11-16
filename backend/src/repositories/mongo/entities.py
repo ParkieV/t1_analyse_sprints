@@ -33,23 +33,24 @@ class EntitiesCRUD(BaseMongoCRUD):
     async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
         return await self._get_objects(out_schema, offset, limit)
 
-    async def get_entities_by_sprint_id(self, sprint_id: str):
-        sprint_object_id = ObjectId(sprint_id)
-        query = {"sprint_id": sprint_object_id}
-        entities = self.collection.find(query).to_list(length=None)
+    async def get_entities_by_sprint_id(self, entity_ids: list[int]) -> list[EntitiesOutDTO]:
+        logger.debug(f'entity_ids: {entity_ids}')
+        entities = await self.collection.find({"entity_id": {'$in': entity_ids}}).to_list()
         return [EntitiesOutDTO(**entity) for entity in entities]
 
     async def get_unique_areas(self) -> Set[str]:
         """ Получить уникальные области из коллекции 'entities' """
         logger.info('Fetching unique areas from entities')
         try:
-            entities = self.collection.find({}, {'area': 1}).to_list(length=None)
-            unique_areas = {entity['area'] for entity in entities if entity['area'] is not None}
-            logger.info(f'Found unique areas: {unique_areas}')
-            return unique_areas
+            entities = await self.collection.find({}, {'area': 1}).to_list(length=None)
+            unique_areas = {entity['area'] for entity in entities if isinstance(entity['area'], str)}
+            logger.debug(f'Found unique areas: {unique_areas}')
         except Exception as e:
             logger.error(f"Failed to fetch unique areas. {e.__class__.__name__}: {e}")
             raise
+
+        logger.info('Found unique areas successfully')
+        return unique_areas
 
     async def get_object_by_id_histories(self, object_id: int, history_get_func: AsyncSeqFunc) -> EntityOutDTO:
         logger.info('Start finding entity')

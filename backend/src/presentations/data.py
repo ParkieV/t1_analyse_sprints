@@ -3,7 +3,7 @@ from bson import ObjectId
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
 
 from src.logger import logger
-from src.schemas.data import EntitiesOutDTO, HistoriesOutDTO, SprintBaseDTO, SprintListOutDTO, SprintOutDTO
+from src.schemas.data import EntitiesOutDTO, HistoriesOutDTO, SprintsOutDTO
 from src.services.utils import check_token
 from src.repositories.mongo import EntitiesCRUD, SprintsCRUD, HistoriesCRUD
 from src.services.parse_data import add_data_to_db
@@ -62,7 +62,7 @@ async def get_sprint(entity_id: int):
     db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     db_context_histories = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
 
-    return await db_context_entities.crud.get_object_by_id_histories(entity_id, db_context_histories.crud.get_object_by_entity_id)
+    return await db_context_entities.crud.get_object_by_id_histories(entity_id, db_context_histories.crud.get_objects_by_entity_id)
 
 
 @router.get('/histories', dependencies=[Depends(check_token)])
@@ -76,33 +76,10 @@ async def get_entities(page_number: int,
 async def get_entities(page_number: int,
                        page_size: int = 15):
     db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
 
-    sprints = await db_context_sprints.crud.get_objects(SprintBaseDTO, (page_number - 1) * page_size, page_size)
-    enriched_sprints = []
+    sprints = await db_context_sprints.crud.get_objects(SprintsOutDTO, (page_number - 1) * page_size, page_size)
 
-    for sprint in sprints:
-        entities = await db_context_entities.crud.get_entities_by_sprint_id(sprint.id)
-
-        completed_count = sum(1 for entity in entities if entity.status in ["Завершено", "Закрыто"])
-        total_count = len(entities)
-        progress = (completed_count / total_count * 100) if total_count > 0 else 0
-
-        last_update_date = max((entity.update_date for entity in entities if entity.update_date), default=None)
-
-        enriched_sprint = SprintListOutDTO(
-            _id=sprint.id,
-            sprint_name=sprint.sprint_name,
-            sprint_status=sprint.sprint_status,
-            sprint_start_date=sprint.sprint_start_date,
-            sprint_end_date=sprint.sprint_end_date,
-            progress=progress,
-            update_date=last_update_date
-        )
-
-        enriched_sprints.append(enriched_sprint)
-    
-    return enriched_sprints
+    return sprints
 
 
 @router.get('/areas', dependencies=[Depends(check_token)])
@@ -118,7 +95,7 @@ async def get_entities():
 @router.get('/sprints/{sprint_id}', dependencies=[Depends(check_token)])
 async def get_sprint(sprint_id: str):
     try:
-        sprint_id = ObjectId(sprint_id)
+        obj_sprint_id = ObjectId(sprint_id)
     except Exception as e:
         logger.error("Could not read 'sprint_id': %s - %s", e.__class__.__name__, e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="parameter 'sprint_id' is invalid")
@@ -126,14 +103,6 @@ async def get_sprint(sprint_id: str):
     db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
     db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     
-    sprint = await db_context_sprints.crud.get_object_by_id(sprint_id)
-    entities = await db_context_entities.crud.get_entities_by_sprint_id(sprint_id)
-    sprint['entities'] = entities
-    
-    completed_count = sum(1 for entity in entities if entity.status in ["Завершен", "Закрыт"])
-    total_count = len(entities)
-    
-    progress = (completed_count / total_count * 100) if total_count > 0 else 0
-    sprint['progress'] = progress
+    sprint = await db_context_sprints.crud.get_object_by_id(obj_sprint_id, db_context_entities.crud.get_entities_by_sprint_id)
 
-    return await SprintOutDTO(**sprint)
+    return sprint
