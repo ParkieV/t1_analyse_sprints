@@ -1,0 +1,59 @@
+services:
+  database:
+    image: mongo
+    env_file: .env
+    volumes:
+      - db_data:/data/db
+      - ./create_local_user.js:/docker-entrypoint-initdb.d/create_local_user.js
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  frontend:
+    image: t1_hack-frontend
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    env_file: .env
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  backend:
+    image: t1_hack-backend
+    env_file: .env
+    environment:
+      APP_PORT: ${BACKEND_PORT}
+      APP_HOST: ${BACKEND_HOST}
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  ml:
+    image: t1_hack-ml
+    environment:
+      HOST: 0.0.0.0
+    env_file: .env
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

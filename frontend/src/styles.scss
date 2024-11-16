@@ -10,6 +10,7 @@ body {
 
 * {
   box-sizing: border-box;
+  font-family: "SF Pro Display", Roboto, "Helvetica Neue", sans-serif;
 }
 
 body {
@@ -23,37 +24,134 @@ body {
 
 body {
   margin: 0;
-  font-family: "SF Pro Display", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .card {
   display: flex;
+  flex-direction: column;
   padding: 16px;
   background: #ffffff;
   border-radius: 20px;
 }
 
-h1 {
-  margin: 0;
-  font-weight: 500;
-  font-size: 36px;
-  line-height: 43px;
-  color: $totalBlack;
+.card-header {
+  display: flex;
+  margin-bottom: 12px;
 }
 
-h2 {
-  margin: 0;
+.card-title {
   font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  color: $totalBlack;
+  font-size: 32px;
+  line-height: 38px;
+  color: $dark1;
+  margin-bottom: 8px;
 }
 
-p {
-  margin: 0;
-  font-weight: 400;
+.card-subtitle {
   font-size: 14px;
   line-height: 17px;
-  color: $black;
   opacity: 0.7;
+  color: $dark1;
+  margin-bottom: 16px;
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+@mixin text($fontSize, $lineHeight, $fontWeight) {
+  font-weight: $fontWeight;
+  font-size: $fontSize;
+  line-height: $lineHeight;
+  color: $totalBlack;
+}
+
+// Headings
+
+.h1 {
+  @include text(56px, 56px, 600);
+}
+
+.h2 {
+  @include text(40px, 44px, 600);
+}
+
+.h3 {
+  @include text(32px, 36px, 600);
+}
+
+.h4 {
+  @include text(32px, 36px, 500);
+}
+
+.h5 {
+  @include text(28px, 32px, 600);
+}
+
+.h6 {
+  @include text(24px, 28px, 600);
+}
+
+.h7 {
+  @include text(20px, 24px, 600);
+}
+
+.h8 {
+  @include text(16px, 20px, 500);
+}
+
+// Main Text
+
+.t1 {
+  @include text(56px, 56px, 400);
+}
+
+.t2 {
+  @include text(40px, 44px, 400);
+}
+
+.t3 {
+  @include text(32px, 36px, 400);
+}
+
+// Description Texts
+
+.d1 {
+  @include text(20px, 28px, 400);
+}
+
+.d2 {
+  @include text(16px, 20px, 400);
+}
+
+.d3 {
+  @include text(14px, 18px, 400);
+}
+
+// Labels
+
+.l1 {
+  @include text(20px, 24px, 500);
+}
+
+.l2 {
+  @include text(16px, 20px, 500);
+}
+
+.l3 {
+  @include text(14px, 18px, 500);
+}
+
+// p {
+//   margin: 0;
+//   font-weight: 400;
+//   font-size: 14px;
+//   line-height: 17px;
+//   color: $dark1;
+//   opacity: 0.7;
+// }

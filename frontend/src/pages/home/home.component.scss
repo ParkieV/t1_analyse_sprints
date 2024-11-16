@@ -1,3 +1,9 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .card-container {
   display: flex;
   gap: 16px;
@@ -6,4 +12,20 @@
 
 app-chart-card {
   flex: 1;
+}
+
+.main-container {
+  display: flex;
+  gap: 16px;
+}
+
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 10;
+}
+
+app-task-cycle-analysis {
+  flex: 9;
 }

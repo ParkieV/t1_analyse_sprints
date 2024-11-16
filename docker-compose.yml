@@ -1,6 +1,5 @@
 services:
   database:
-    container_name: mongo
     image: mongo
     platform: linux/arm64
     restart: unless-stopped
@@ -12,7 +11,6 @@ services:
       - ./create_local_user.js:/docker-entrypoint-initdb.d/create_local_user.js
 
   frontend:
-    container_name: frontend
     restart: unless-stopped
     build:
       context: frontend
@@ -31,11 +29,6 @@ services:
       context: backend
       dockerfile: Dockerfile
     env_file: .env
-    environment:
-      APP_PORT: ${BACKEND_PORT}
-      APP_HOST: ${BACKEND_HOST}
-    ports:
-      - 8010:8010
     depends_on:
       database:
         condition: service_started
@@ -43,7 +36,6 @@ services:
         condition: service_started
 
   ml:
-    container_name: ml
     restart: unless-stopped
     env_file: .env
     environment:

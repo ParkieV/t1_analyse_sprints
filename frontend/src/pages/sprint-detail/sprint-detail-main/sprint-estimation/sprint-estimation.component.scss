@@ -1,0 +1,20 @@
+.info {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  margin-bottom: 0;
+  margin-right: 16px;
+}
+
+.comment {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+.comment--positive {
+  color: #259222;
+}

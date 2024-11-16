@@ -1,0 +1,16 @@
+<div class="card">
+  <div class="card-header">
+    <h3 class="h8">Прогнозируемый срок завершения спринта</h3>
+  </div>
+
+  <div class="info">
+    <div class="card-title">
+      {{ estimationDate | date : "short" }}
+    </div>
+    <div class="comment comment--positive">
+        {{ comment }}
+    </div>
+  </div>
+
+  <app-sprint-estimation-chart></app-sprint-estimation-chart>
+</div>

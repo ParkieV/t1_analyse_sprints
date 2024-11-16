@@ -1,10 +1,29 @@
 import math
 from datetime import datetime
+from typing import Optional
 
 from pydantic import field_validator, model_validator
 
 from src.schemas.user import CustomBaseModel
 
+
+class HistoriesOutDTO(CustomBaseModel):
+    entity_id: int | None
+    history_property_name: str | None
+    history_date: datetime | None
+    history_version: int | None
+    history_change_type: str | None
+    history_change: str | None
+
+    @field_validator("history_date", mode="before")
+    def convert_datetime(cls, value):
+        if isinstance(value, datetime):
+            return value
+        return datetime.strptime(value, "%m/%d/%y %H:%M")
+
+    @model_validator(mode="before")
+    def handle_nan(cls, values):
+        return {k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in values.items()}
 
 class EntitiesOutDTO(CustomBaseModel):
     entity_id: int | None
@@ -29,32 +48,28 @@ class EntitiesOutDTO(CustomBaseModel):
     workgroup: str | None
     resolution: str | None
 
-    @model_validator(mode="before")
-    def handle_nan(cls, values):
-        return {k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in values.items()}
-
-
-class HistoriesOutDTO(CustomBaseModel):
-    entity_id: int | None
-    history_property_name: str | None
-    history_date: datetime | None
-    history_version: int | None
-    history_change_type: str | None
-    history_change: str | None
-
-    @field_validator("history_date", mode="before")
+    @field_validator("due_date", mode="before")
     def convert_datetime(cls, value):
-        if isinstance(value, datetime):
+        if (value is None) or isinstance(value, datetime):
             return value
-        return datetime.strptime(value, "%m/%d/%y %H:%M")
+        return datetime.strptime(value, "%m/%d/%y")
 
     @model_validator(mode="before")
     def handle_nan(cls, values):
         return {k: (None if isinstance(v, float) and math.isnan(v) else v) for k, v in values.items()}
 
-class SprintsOutDTO(CustomBaseModel):
+class EntityOutDTO(EntitiesOutDTO):
+    history_ids: list[HistoriesOutDTO]
+
+class SprintBaseDTO(CustomBaseModel):
     sprint_name: str | None
     sprint_status: str | None
     sprint_start_date: datetime | None
     sprint_end_date: datetime | None
-    entity_ids: list[int] | None
+    progress: float | None
+
+class SprintsOutDTO(SprintBaseDTO):
+    update_date: datetime | None
+
+class SprintOutDTO(SprintBaseDTO):
+    entities: list[EntitiesOutDTO] | None

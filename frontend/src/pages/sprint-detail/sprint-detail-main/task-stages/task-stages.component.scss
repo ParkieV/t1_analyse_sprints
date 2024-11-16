@@ -1,0 +1,49 @@
+@import "variables";
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  height: 32px;
+  align-items: center;
+}
+
+.option-title {
+  font-size: 14px;
+  line-height: 18px;
+  color: $dark1;
+  flex: 3;
+}
+
+.option-progress-wrapper {
+  flex: 0 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.option-progress-value {
+  width: 100%;
+}
+
+.option-progress-value {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.option-progressbar-wrapper {
+  width: 80px;
+  height: 4px;
+  position: relative;
+  background: $fieldPrimary;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.option-progress {
+  height: 100%;
+}

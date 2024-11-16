@@ -1,3 +1,5 @@
+from multiprocessing.context import AuthenticationError
+
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException
 

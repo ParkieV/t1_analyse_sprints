@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { SidebarLinkComponent } from './sidebar-link/sidebar-link.component';
+import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -9,5 +11,5 @@ import { SidebarLinkComponent } from './sidebar-link/sidebar-link.component';
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
-
+  
 }

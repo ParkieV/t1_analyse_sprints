@@ -1,0 +1,21 @@
+<div class="card">
+  <app-task-stages-chart [config]="config"></app-task-stages-chart>
+
+  <div class="options">
+    @for (option of options; track $index) {
+    <div class="option">
+      <div class="option-title">
+        {{ option.name }}
+      </div>
+      <div class="option-progress-wrapper">
+        <div class="option-progress-value" [ngStyle]="{ color: option.color }">
+            {{ option.percent | number:'0.1-1' }}%
+        </div>
+        <div class="option-progressbar-wrapper">
+            <div class="option-progress" [ngStyle]="{ background: option.color, width: option.percent + '%' }"></div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>

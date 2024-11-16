@@ -1,4 +1,5 @@
 import pandas as pd
+from bson import ObjectId
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
 
 from src.logger import logger
@@ -56,6 +57,13 @@ async def get_entities(page_number: int,
     db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     return await db_context.crud.get_objects(EntitiesOutDTO, (page_number - 1) * page_size, page_size)
 
+@router.get('/entities/{entity_id}', dependencies=[Depends(check_token)])
+async def get_sprint(entity_id: int):
+    db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    db_context_histories = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+
+    return await db_context_entities.crud.get_object_by_id_histories(entity_id, db_context_histories.crud.get_objects_by_entity_id)
+
 
 @router.get('/histories', dependencies=[Depends(check_token)])
 async def get_entities(page_number: int,
@@ -67,5 +75,34 @@ async def get_entities(page_number: int,
 @router.get('/sprints', dependencies=[Depends(check_token)])
 async def get_entities(page_number: int,
                        page_size: int = 15):
-    db_context = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    return await db_context.crud.get_objects(SprintsOutDTO, (page_number - 1) * page_size, page_size)
+    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+
+    sprints = await db_context_sprints.crud.get_objects(SprintsOutDTO, (page_number - 1) * page_size, page_size)
+
+    return sprints
+
+
+@router.get('/areas', dependencies=[Depends(check_token)])
+async def get_entities():
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_unique_areas()
+
+@router.get('/change_types', dependencies=[Depends(check_token)])
+async def get_entities():
+    db_context = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+    return await db_context.crud.get_change_types()
+
+@router.get('/sprints/{sprint_id}', dependencies=[Depends(check_token)])
+async def get_sprint(sprint_id: str):
+    try:
+        obj_sprint_id = ObjectId(sprint_id)
+    except Exception as e:
+        logger.error("Could not read 'sprint_id': %s - %s", e.__class__.__name__, e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="parameter 'sprint_id' is invalid")
+
+    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+    db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    
+    sprint = await db_context_sprints.crud.get_object_by_id(obj_sprint_id, db_context_entities.crud.get_entities_by_sprint_id)
+
+    return sprint
