@@ -1,0 +1,28 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+app-sprint-card {
+  flex: 1;
+}
+
+.main-container {
+  display: flex;
+  gap: 16px;
+}
+
+app-task-stages {
+  flex: 2;
+}
+
+app-sprint-estimation {
+  flex: 8;
+}

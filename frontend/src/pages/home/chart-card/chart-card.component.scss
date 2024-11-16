@@ -2,6 +2,7 @@
 
 .value {
   margin-right: 16px;
+  line-height: 1;
 }
 
 .increase {
@@ -28,8 +29,9 @@
 
 .card {
   flex-direction: column;
-  height: 126px;
-  justify-content: space-between;   
+  height: 105px;
+  padding-bottom: 20px;
+  justify-content: space-between;
 }
 
 .content {
@@ -38,5 +40,5 @@
 }
 
 h2 {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }

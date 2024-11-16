@@ -3,8 +3,8 @@ import { dataSeries } from './data-series';
 import { Component } from '@angular/core';
 import { TaskCycleAnalysisChartComponent } from './task-cycle-analysis-chart/task-cycle-analysis-chart.component';
 import { TaskCycleAnalysisOptionComponent } from './task-cycle-analysis-option/task-cycle-analysis-option.component';
+import { CHART_COLORS } from '../../../models/chart-colors';
 
-const COLORS = ['#2CB28F', '#7FA6D2', '#4A13C3'];
 
 interface Option {
   title: string;
@@ -28,17 +28,17 @@ export class TaskCycleAnalysisComponent {
   options: Option[] = [
     {
       title: 'К выполнению',
-      color: COLORS[0],
+      color: CHART_COLORS[0],
       dataSeries: dataSeries.slice(),
     },
     {
       title: 'В работе',
-      color: COLORS[1],
+      color: CHART_COLORS[1],
       dataSeries: dataSeries.slice(),
     },
     {
       title: 'Сделано',
-      color: COLORS[2],
+      color: CHART_COLORS[2],
       dataSeries: dataSeries.slice(),
     },
   ];

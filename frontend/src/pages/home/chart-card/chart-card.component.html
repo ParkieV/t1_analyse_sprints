@@ -1,7 +1,7 @@
 <div class="card">
     <h2 class="h8">{{ title }}</h2>
     <div class="content">
-        <div class="h6 value">{{ value }}</div>
+        <div class="h4 value">{{ value }}</div>
         <div *ngIf="change > 0" class="increase">+{{ change }}</div>
         <div *ngIf="change < 0" class="decrease">{{ change }}</div>
         <div *ngIf="change == 0" class="zero">–</div>
