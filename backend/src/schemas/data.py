@@ -60,12 +60,14 @@ class EntitiesOutDTO(CustomBaseModel):
 class EntityOutDTO(EntitiesOutDTO):
     history_ids: list[HistoriesOutDTO]
 
-class SprintsOutDTO(CustomBaseModel):
+class SprintBaseDTO(CustomBaseModel):
     sprint_name: str | None
     sprint_status: str | None
     sprint_start_date: datetime | None
     sprint_end_date: datetime | None
+
+class SprintsOutDTO(SprintBaseDTO):
     entity_ids: list[int] | None
 
-class SprintOutDTO(SprintsOutDTO):
+class SprintOutDTO(SprintBaseDTO):
     entity_ids: list[EntitiesOutDTO] | None

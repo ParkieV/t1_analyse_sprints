@@ -1,10 +1,10 @@
-from collections.abc import Callable, Coroutine, Sequence
-from typing import TypeVar, ParamSpec
+from collections.abc import Callable, Coroutine, Sequence, Mapping
+from typing import TypeVar, ParamSpec, Any
 
 from attrs import define
 
 from src.logger import logger
-from src.repositories.mongo.base_crud import BaseMongoCRUD
+from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
 from src.schemas.data import EntitiesOutDTO, EntityOutDTO
 from src.schemas.user import CustomBaseModel
 
@@ -28,6 +28,9 @@ class EntitiesCRUD(BaseMongoCRUD):
         logger.info('Found entity successfully')
 
         return EntitiesOutDTO(**entity)
+
+    async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
+        return await self._get_objects(out_schema, offset, limit)
 
     async def get_object_by_id_histories(self, object_id: int, history_get_func: AsyncSeqFunc) -> EntityOutDTO:
         logger.info('Start finding entity')

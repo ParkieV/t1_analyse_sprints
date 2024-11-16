@@ -40,7 +40,7 @@ class BaseMongoCRUD:
     async def get_object_by_id(self, *args, **kwargs) -> Any:
         pass
 
-    async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
+    async def _get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
         try:
             objects = self.collection.find()
             if offset is not None:
@@ -52,6 +52,10 @@ class BaseMongoCRUD:
             raise
 
         return [out_schema(**db_object) for db_object in objects.to_list()]
+
+    @abstractmethod
+    async def get_objects(self, *args, **kwargs) -> Any:
+        pass
 
     async def insert_objects(self, data: Sequence[Mapping[str, Any]]) -> None:
         try:

@@ -1,10 +1,11 @@
+from collections.abc import Mapping
 from typing import Any
 
 from attrs import define
 from pyasn1.type.univ import Sequence
 
 from src.logger import logger
-from src.repositories.mongo.base_crud import BaseMongoCRUD
+from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
 from src.schemas.data import HistoriesOutDTO
 
 
@@ -16,6 +17,9 @@ class HistoriesCRUD(BaseMongoCRUD):
 
     async def get_object_by_id(self, object_id: str) -> Any:
         return await self._get_object_by_id(object_id)
+
+    async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
+        return await self._get_objects(out_schema, offset, limit)
 
     async def get_object_by_entity_id(self, entity_id: int) -> list[HistoriesOutDTO]:
         logger.info('Start finding histories')

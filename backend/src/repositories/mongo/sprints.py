@@ -1,12 +1,12 @@
 from collections.abc import Callable, Coroutine
-from typing import TypeVar, ParamSpec
+from typing import TypeVar, ParamSpec, Mapping, Any
 
 from attrs import define
 from bson import ObjectId
 
 from src.logger import logger
 from src.schemas.data import SprintOutDTO
-from src.repositories.mongo.base_crud import BaseMongoCRUD
+from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
 from src.schemas.user import CustomBaseModel
 
 T = TypeVar("T", bound=CustomBaseModel)
@@ -18,6 +18,9 @@ class SprintsCRUD(BaseMongoCRUD):
     """ Класс для работы с коллекцией 'sprints' """
 
     collection_name: str = 'sprints'
+
+    async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
+        return await self._get_objects(out_schema, offset, limit)
 
     async def get_object_by_id(self, object_id: ObjectId, entity_getting_func: AsyncFunc) -> SprintOutDTO:
         logger.info('Start finding sprint')
