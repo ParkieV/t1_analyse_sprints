@@ -18,10 +18,13 @@ class UtilitiesCalulations:
     def according_to_datestamp(self, d2_array, datestamp):
         res = []
         for inst in d2_array:
-            if inst[1] <= datestamp:
-                res.append(inst)
+            if type(datestamp) == list:
+                if datestamp[0] <= inst[1] <= datestamp[1]:
+                    res.append(inst)
+            else:
+                if inst[1] <= datestamp:
+                    res.append(inst)
         return res
-
     def search_through_status_changes(self, key, fake_status_changes, datestamp):
         status_change_trace = []
         instance_data = self.according_to_datestamp(self.history_main_dict[key], datestamp)
@@ -72,8 +75,7 @@ class UtilitiesCalulations:
     def late_create_searcher(self, key, late_create, datestamp, sprint_start_date):
         instance_data = self.according_to_datestamp(self.history_main_dict[key], datestamp)
         for i in range(len(instance_data)):
-            if (instance_data[i][3] == 'CREATED'):
-                print(instance_data[i], (instance_data[i][3] == 'CREATED'), ((instance_data[i][1] - datestamp).days > 2))
+                # print(instance_data[i], (instance_data[i][3] == 'CREATED'), ((instance_data[i][1] - datestamp).days > 2))
             if (instance_data[i][3] == 'CREATED') and ((instance_data[i][1] - sprint_start_date).days > 2):
                 
                 late_create += 1
@@ -106,9 +108,41 @@ async def get_backlog_change(sprint_name : str, time : datetime):
         late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
 
     data = {
-        "backlog_changed_persents": round(late_create / len(instances) * 100)
+        "backlog_changed_persents": round(late_create / len(instances) * 100),
+        "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
     }
 
     return JSONResponse(content=data)
+
+
+@add_router.get('/backlog_change_interval')
+async def get_backlog_change(sprint_name : str, time_left : datetime, time_right : datetime):
+    time = [time_left, time_right]
+    db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+    history_main_dict = dict()
+    sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+    history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+    for pack in sprints_data:
+        if pack.sprint_name == sprint_name:
+            instances = pack.entity_ids
+            sprint_end_date = pack.sprint_end_date
+            sprint_start_date = pack.sprint_start_date
+            if (time_left - sprint_start_date).days <= 2 and (time_right - sprint_start_date).days <= 2:
+                return JSONResponse(content={"backlog_changed_persents": 0, "Status" : "Good"})
     
+    for event in history_data:  
+        if event.entity_id in instances:
+            add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+    
+    x = UtilitiesCalulations(history_main_dict)
+    late_create =  0
+    for inst in instances:
+        late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
+
+    data = {
+        "backlog_changed_persents": round(late_create / len(instances) * 100),
+        "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
+    }
+    return JSONResponse(content=data)
     
