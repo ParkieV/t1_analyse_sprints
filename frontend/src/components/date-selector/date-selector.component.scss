@@ -1,0 +1,31 @@
+@import "variables";
+
+:host {
+    display: flex;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 7px;
+  background: $fieldPrimary;
+  border-radius: 8px;
+}
+
+.option {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 19px;
+  color: $dark1;
+  cursor: pointer;
+
+  &--active {
+    background-color: $white;
+  }
+}

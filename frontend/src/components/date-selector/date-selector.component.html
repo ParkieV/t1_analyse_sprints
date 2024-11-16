@@ -1,0 +1,37 @@
+<div class="container">
+  <div
+    [ngClass]="{ 'option--active': activeOption === 'today' }"
+    (click)="setOption('today')"
+    class="option"
+  >
+    Сегодня
+  </div>
+  <div
+    [ngClass]="{ 'option--active': activeOption === 'week' }"
+    (click)="setOption('week')"
+    class="option"
+  >
+    Неделя
+  </div>
+  <div
+    [ngClass]="{ 'option--active': activeOption === 'month' }"
+    (click)="setOption('month')"
+    class="option"
+  >
+    Месяц
+  </div>
+  <div
+    [ngClass]="{ 'option--active': activeOption === 'quart' }"
+    (click)="setOption('quart')"
+    class="option"
+  >
+    Квартал
+  </div>
+  <div
+    [ngClass]="{ 'option--active': activeOption === 'dates' }"
+    (click)="setOption('dates')"
+    class="option"
+  >
+    Выбрать даты
+  </div>
+</div>
