@@ -24,13 +24,13 @@ class HistoriesCRUD(BaseMongoCRUD):
     async def get_objects_by_entity_id(self, entity_id: int) -> list[HistoriesOutDTO]:
         logger.info('Start finding histories')
         try:
-            histories = await self.collection.find({'entity_id': entity_id}).to_list()
+            histories = self.collection.find({'entity_id': entity_id})
         except Exception as e:
             logger.error("Error finding histories: %s - %s", e.__class__.__name__, e)
             raise
         logger.info('Found histories successfully')
 
-        return [HistoriesOutDTO(**history) for history in histories]
+        return [HistoriesOutDTO(**history) for history in await histories.to_list()]
 
     async def get_change_types(self) -> Set[str]:
         """ Получить уникальные области из коллекции 'histories' """
