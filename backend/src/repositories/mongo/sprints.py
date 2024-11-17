@@ -66,7 +66,3 @@ class SprintsCRUD(BaseMongoCRUD):
 
         sprint['progress'] = (completed_count / total_count * 100) if total_count > 0 else 0
         return SprintOutDTO(**sprint)
-
-    async def get_last_sprint(self, entity_ids: set[int]):
-        sprint = await self.collection.find({'entity_ids': {'$in': entity_ids}}).sort('sprint_start_date', -1).limit(1).next()
-        return sprint['sprint_name']

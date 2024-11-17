@@ -1,13 +1,12 @@
 import pandas as pd
 from bson import ObjectId
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
-from rapidfuzz import process, fuzz
 
 from src.logger import logger
 from src.schemas.data import EntitiesOutDTO, HistoriesOutDTO, SprintsOutDTO
 from src.services.utils import check_token
 from src.repositories.mongo import EntitiesCRUD, SprintsCRUD, HistoriesCRUD
-from src.services.parse_data import add_data_to_db, db_context
+from src.services.parse_data import add_data_to_db
 from src.repositories.mongo_context import MongoContext
 
 router = APIRouter(prefix="/data", tags=["Data endpoints"])
@@ -110,74 +109,10 @@ async def get_sprint(sprint_id: str):
 
 @router.get('/employees', dependencies=[Depends(check_token)])
 async def get_employees(employees: str | None = None, teams: str | None = None):
-    db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
-    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-
-    employees = await db_context_entities.crud.get_employees(employees, teams)
-    employees_list = []
-    for employee in employees:
-        employee_dict = {}
-        employee_dict['employee'] = employee
-        employee_dict['sprint'] = await db_context_entities.crud.get_actual_sprint(employee, db_context_sprints.crud.get_last_sprint)
-        logger.debug(employee_dict['sprint'])
-        employees_list.append(employee_dict)
-    return employees_list
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_employees(employees, teams)
 
 @router.get('/commands', dependencies=[Depends(check_token)])
 async def get_teams():
     db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     return await db_context.crud.get_teams_with_members()
-
-@router.get('/search/sprints', dependencies=[Depends(check_token)])
-async def get_sprints(search_query: str):
-    db_context = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-
-    data = await db_context.crud.get_column_values('sprint_name')
-    logger.debug(f'sprint data: {data}')
-    data_df = pd.DataFrame(data, columns=['sprint_name'])
-
-    matches = process.extract(search_query, data, scorer=fuzz.ratio)
-    logger.debug(f'matches: {matches}')
-
-    threshold = 68
-    matched_values = [match[0] for match in matches if match[1] >= threshold]
-    result = data_df[data_df['sprint_name'].isin(matched_values)]
-    logger.debug(f'Results: {result}')
-
-    return result
-
-@router.get('/search/entities', dependencies=[Depends(check_token)])
-async def get_entities(search_query: str):
-    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
-
-    data = await db_context.crud.get_column_values('name')
-    logger.debug(f'entity data: {data}')
-    data_df = pd.DataFrame(data, columns=['name'])
-
-    matches = process.extract(search_query, data, scorer=fuzz.ratio)
-    logger.debug(f'matches: {matches}')
-
-    threshold = 20
-    matched_values = [match[0] for match in matches if match[1] >= threshold]
-    result = data_df[data_df['name'].isin(matched_values)]
-    logger.debug(f'Results: {result}')
-
-    return result
-
-@router.get('/search/histories', dependencies=[Depends(check_token)])
-async def get_histories(search_query: str):
-    db_context = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
-
-    data = await db_context.crud.get_column_values('history_property_name')
-    logger.debug(f'entity data: {data}')
-    data_df = pd.DataFrame(data, columns=['history_property_name'])
-
-    matches = process.extract(search_query, data, scorer=fuzz.ratio)
-    logger.debug(f'matches: {matches}')
-
-    threshold = 20
-    matched_values = [match[0] for match in matches if match[1] >= threshold]
-    result = data_df[data_df['history_property_name'].isin(matched_values)]
-    logger.debug(f'Results: {result}')
-
-    return result
