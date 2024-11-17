@@ -120,4 +120,22 @@ export class SprintsService {
       },
     });
   }
+
+  getAllSprintMetricsOverall(
+    dateFrom: Date,
+    dateTo: Date
+  ): Observable<{sprints: {sprintName: string, result: SprintMetricsGroup[]}[], intervals: string[]}> {
+    const url = 'base_metrics_interval_splitted_for_all';
+    // debugger;
+    const dateFromString = getDateString(dateFrom);
+    const dateToString = getDateString(dateTo);
+    return this._mlApiService.get(url, {
+      params: {
+        time_left: dateFromString,
+        time_right: dateToString,
+        splits: '10',
+      },
+    });
+  }
+  
 }

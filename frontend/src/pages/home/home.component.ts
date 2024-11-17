@@ -26,6 +26,10 @@ import { CommonModule } from '@angular/common';
 export class HomeComponent {
   res?: SprintMetricsGroup;
 
+  allSprints?: { sprintName: string; result: SprintMetricsGroup[] }[];
+
+  dates?: Date[];
+
   get notComplete() {
     if (!this.res) return 0;
     return (
@@ -62,12 +66,17 @@ export class HomeComponent {
     const today = new Date();
     const prevMonth = new Date();
     prevMonth.setMonth(today.getMonth() - 1);
-    debugger;
     this._sprintsService
       .getAllSprintMetrics(prevMonth, today)
       .subscribe((res) => {
-        debugger;
         this.res = res;
+      });
+    this._sprintsService
+      .getAllSprintMetricsOverall(prevMonth, today)
+      .subscribe((res) => {
+        debugger;
+        this.allSprints = res.sprints;
+        this.dates = res.intervals.map(interval => new Date(interval));
       });
   }
 }
