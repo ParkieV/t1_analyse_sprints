@@ -34,14 +34,14 @@ export class TaskCycleAnalysisChartComponent {
   @Input({ required: true}) color!: string;
   
   @Input({ required: true })
-  public get dataSeries(): { date: string; value: number; }[][] {
+  public get dataSeries(): { date: string; value: number; }[] {
     return this._dataSeries;
   }
-  public set dataSeries(value: { date: string; value: number; }[][]) {
+  public set dataSeries(value: { date: string; value: number; }[]) {
     this._dataSeries = value;
     this.initChartData();
   }
-  private _dataSeries!: { date: string; value: number; }[][];
+  private _dataSeries!: { date: string; value: number; }[];
 
   constructor() {
   }
@@ -53,10 +53,12 @@ export class TaskCycleAnalysisChartComponent {
   public initChartData(): void {
     let ts2 = 1484418600000;
     let dates = [];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < this.dataSeries.length; i++) {
       ts2 = ts2 + 86400000;
-      dates.push([ts2, this.dataSeries[1][i].value]);
+      dates.push([new Date(this.dataSeries[i].date).getTime(), this.dataSeries[i].value]);
     }
+
+    debugger;
 
     this.series = [
       {
@@ -101,7 +103,7 @@ export class TaskCycleAnalysisChartComponent {
     this.yaxis = {
       labels: {
         formatter: function (val) {
-          return (val / 1000000).toFixed(0);
+          return (val).toFixed(0);
         },
       },
       // title: {
@@ -115,7 +117,7 @@ export class TaskCycleAnalysisChartComponent {
       shared: false,
       y: {
         formatter: function (val) {
-          return (val / 1000000).toFixed(0);
+          return (val).toFixed(0);
         },
       },
     };

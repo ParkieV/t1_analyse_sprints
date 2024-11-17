@@ -30,6 +30,7 @@ export class TaskCycleAnalysisComponent {
   @Input() set allSprints(
     value: { sprintName: string; result: SprintMetricsGroup[] }[]
   ) {
+    debugger;
     setTimeout(() => {
       let i = 0;
       this.options = value.map((sprint) => {
@@ -37,7 +38,7 @@ export class TaskCycleAnalysisComponent {
         for (let j = 0; j < sprint.result.length; j++) {
           dataSeries.push({
             date: this.dates[j],
-            value: sprint.result[j],
+            value: sprint.result[j].health.healthValue,
           });
         }
         return {
@@ -47,12 +48,13 @@ export class TaskCycleAnalysisComponent {
         };
       });
       this.activeOption = this.options[0];
+      debugger;
     });
   }
 
-  title: string = '8 дней';
+  title: string = 'Здоровье';
 
-  subtitle: string = 'Среднее время потраченное на задачу';
+  subtitle: string = 'Спринты за последний месяц';
 
   options?: Option[];
 

@@ -13,8 +13,8 @@ export class LoadIndicatorComponent {
   @Input()
   value: number = 70;
 
-  title: string = 'Оптимально';
+  title: string = 'Здоровье по всем спринтам';
 
-  subtitle: string = 'Сотрудники загружены оптимально';
+  subtitle: string = '';
 
 }
