@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.routes.default_metrics import router
 from src.routes.additional_metrics import add_router
+from src.routes.person_metrics import person_router
 from src.repositories.mongo_context import MongoContext
 
 @asynccontextmanager
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, root_path="/api_ml")
 app.include_router(router)
 app.include_router(add_router)
+app.include_router(person_router)
 
 if __name__ == "__main__":
     try:
