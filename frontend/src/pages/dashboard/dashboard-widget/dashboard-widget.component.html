@@ -1,0 +1,78 @@
+<div *ngIf="isEditing" class="card">
+  <ng-template view-host></ng-template>
+
+  <div class="component-selector">
+    <button class="component-selector-button" [matMenuTriggerFor]="widgetMenu">
+      Выбрать компонент
+    </button>
+  </div>
+
+  <mat-menu #widgetMenu>
+    @for (widget of widgets; track $index) {
+    <button (click)="selectWidget(widget.key)" mat-menu-item>
+      {{ widget.name }}
+    </button>
+    }
+  </mat-menu>
+
+  <div class="sizes-container">
+
+    <div *ngIf="canResizeContainer" class="sizes">
+        <div class="sizes-title">{{ container.position === 'row' ? 'Высота' : 'Ширина' }}:</div>
+        <div
+        (click)="setContainerFlex(1)"
+        [ngClass]="{ 'size--active': 1 === container.flex }"
+        class="size size--small"
+        >
+        1
+        </div>
+        <div
+        (click)="setContainerFlex(2)"
+        [ngClass]="{ 'size--active': 2 === container.flex }"
+        class="size size--medium"
+        >
+        2
+        </div>
+        <div
+        (click)="setContainerFlex(3)"
+        [ngClass]="{ 'size--active': 3 === container.flex }"
+        class="size size--large"
+        >
+        3
+        </div>
+    </div>
+
+    <div *ngIf="canResize" class="sizes">
+        <div class="sizes-title">{{ container.position === 'row' ? 'Ширина' : 'Высота' }}:</div>
+        <div
+        (click)="setFlex(1)"
+        [ngClass]="{ 'size--active': 1 === widget.flex }"
+        class="size size--small"
+        >
+        1
+        </div>
+        <div
+        (click)="setFlex(2)"
+        [ngClass]="{ 'size--active': 2 === widget.flex }"
+        class="size size--medium"
+        >
+        2
+        </div>
+        <div
+        (click)="setFlex(3)"
+        [ngClass]="{ 'size--active': 3 === widget.flex }"
+        class="size size--large"
+        >
+        3
+        </div>
+    </div>
+    </div>
+</div>
+
+<div *ngIf="!isEditing && !activeComponent" class="card">
+  <div class="ghost">Компонент не выбран</div>
+</div>
+
+<ng-container *ngIf="!isEditing && activeComponent">
+    <ng-template view-host></ng-template>
+</ng-container>

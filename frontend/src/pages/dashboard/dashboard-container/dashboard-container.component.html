@@ -1,0 +1,22 @@
+@for (element of container.elements; track element) {
+<div class="block" [ngStyle]="{ flexGrow: element.flex }">
+  <ng-container *ngIf="element.type === 'widget'" class="widget">
+    <ng-container *ngIf="isEditing">
+      <button class="action action--bottom" (click)="addContainer('column', $index)">
+        +
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="isEditing">
+      <button class="action action--right" (click)="addContainer('row', $index)">
+        +
+      </button>
+    </ng-container>
+
+    <app-dashboard-widget [canResizeContainer]="$index === 0 && container !== hostContainer" [canResize]="container.elements.length > 1" [widget]="element" [container]="container"></app-dashboard-widget>
+  </ng-container>
+  <ng-container *ngIf="element.type === 'container'" class="container">
+    <app-dashboard-container (createContainer)="onAddContainer($event)" [container]="element"></app-dashboard-container>
+  </ng-container>
+</div>
+}

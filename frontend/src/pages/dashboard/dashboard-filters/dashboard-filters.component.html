@@ -1,0 +1,8 @@
+<div class="card">
+    <app-date-selector></app-date-selector>
+    <div class="filters">
+        <button *ngIf="!isEditing" (click)="edit()" class="edit">Редактировать</button>
+        <button *ngIf="isEditing" (click)="save()" class="edit">Сохранить</button>
+        <button *ngIf="isEditing" (click)="clear()" class="edit">Очистить</button>
+    </div>
+</div>

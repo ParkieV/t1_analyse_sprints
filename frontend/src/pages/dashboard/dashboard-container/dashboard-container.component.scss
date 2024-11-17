@@ -1,0 +1,114 @@
+@import "variables";
+
+:host {
+  display: flex;
+  gap: 16px;
+  //   border: 3px solid black;
+  border-radius: 20px;
+  flex-basis: 50px;
+  position: relative;
+
+  height: 100%;
+}
+
+:host.row {
+  flex-direction: row;
+}
+
+:host.column {
+  flex-direction: column;
+}
+
+.actions {
+  position: absolute;
+  display: flex;
+  gap: 8px;
+
+  &--row {
+    flex-direction: row;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &--column {
+    flex-direction: column;
+    right: 30px;
+    top: 50%;
+    transform: translateY(50%);
+  }
+}
+
+.block {
+  position: relative;
+  flex-basis: 50px;
+  //   min-width: 300px;
+}
+
+.action {
+  position: absolute;
+  z-index: 10;
+  border: none;
+  background: none;
+  padding: 10px;
+  font-size: 18px;
+  color: $dark1;
+  transition: 0.1s ease-out;
+  cursor: pointer;
+
+  &:hover {
+    background: $primary6;
+  }
+
+  &--right {
+    right: 0;
+    // top: 50%;
+    top: 0;
+    bottom: 0;
+    // transform: translateY(50%);
+    height: 100%;
+  }
+
+  &--bottom {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+  }
+}
+
+.outside-action {
+  position: absolute;
+  z-index: 10;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: center;
+  font-size: 18px;
+  line-height: 16px;
+  color: $dark1;
+  transition: 0.1s ease-out;
+  cursor: pointer;
+  opacity: 0;
+
+  &:hover {
+    background: $primary6;
+    opacity: 1;
+  }
+
+  &--right {
+    right: -16px;
+    width: 16px;
+    // top: 50%;
+    top: 0;
+    bottom: 0;
+    // transform: translateY(50%);
+    height: 100%;
+  }
+
+  &--bottom {
+    height: 16px;
+    bottom: -16px;
+    width: 100%;
+  }
+}
