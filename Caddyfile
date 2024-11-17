@@ -4,10 +4,10 @@
 {$DOMAIN} {
 
 	handle /api/* {
-		reverse_proxy t1_hack_stack_backend:8000
+		reverse_proxy backend:8000
 	}
 	handle /api_ml/* {
-		reverse_proxy t1_hack_stack_ml:8010
+		reverse_proxy ml:8010
 	}
 	handle {
 		root * /srv

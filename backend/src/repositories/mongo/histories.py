@@ -1,12 +1,12 @@
+import logging
 from collections.abc import Mapping
-import math
 from typing import Any, Set
 
 from attrs import define
 
 from src.logger import logger
 from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
-from src.schemas.data import EntitiesOutDTO, HistoriesOutDTO
+from src.schemas.data import HistoriesOutDTO
 
 
 @define
@@ -30,16 +30,19 @@ class HistoriesCRUD(BaseMongoCRUD):
             raise
         logger.info('Found histories successfully')
 
-        return [HistoriesOutDTO(**history) for history in histories]
+        return [HistoriesOutDTO(**history) for history in await histories.to_list()]
 
     async def get_change_types(self) -> Set[str]:
         """ Получить уникальные области из коллекции 'histories' """
         logger.info('Fetching unique change_types from histories')
+
         try:
-            histories = self.collection.find({}, {'history_change_type': 1}).to_list(length=None)
+            histories = await self.collection.find({}, {'history_change_type': 1}).to_list(length=None)
             change_types = {history['history_change_type'] for history in histories if isinstance(history['history_change_type'], str)}
-            logger.info(f'Found unique change_types: {change_types}')
-            return change_types
+            logger.debug(f'Found unique change_types: {change_types}')
         except Exception as e:
             logger.error(f"Failed to fetch unique change_types. {e.__class__.__name__}: {e}")
             raise
+
+        logging.info('Found unique change_types successfully')
+        return change_types

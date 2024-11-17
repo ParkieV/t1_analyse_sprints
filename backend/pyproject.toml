@@ -16,10 +16,10 @@ python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 colorlog = "^6.9.0"
 attrs = "^24.2.0"
-pymongo = "^4.10.1"
 python-multipart = "^0.0.17"
 bcrypt = "3.1.7"
 pandas = "^2.2.3"
+motor = "^3.6.0"
 
 
 [build-system]

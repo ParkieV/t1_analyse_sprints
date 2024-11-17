@@ -1,10 +1,11 @@
+from collections.abc import Mapping
 from typing import Any
 
 from attrs import define
 from starlette.authentication import AuthenticationError
 
 from src.logger import logger
-from src.repositories.mongo.base_crud import BaseMongoCRUD
+from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
 from src.schemas.user import UserOutDTO
 
 
@@ -17,9 +18,12 @@ class UsersCRUD(BaseMongoCRUD):
     async def get_object_by_id(self, object_id: str) -> Any:
         return await self._get_object_by_id(object_id)
 
+    async def get_objects(self, out_schema: type(SchemaOut), offset: int | None = None, limit: int | None = None) -> list[Mapping[str, Any]]:
+        return await self._get_objects(out_schema, offset, limit)
+
     async def get_object_by_username(self, username: str) -> UserOutDTO:
         try:
-            user = self.collection.find_one({'username': username})
+            user = await self.collection.find_one({'username': username})
             if user is None:
                 raise AuthenticationError('User not found')
         except Exception as e:
