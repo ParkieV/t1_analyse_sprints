@@ -350,7 +350,10 @@ async def base_metrics_interval_splitted(time_left : datetime, time_right : date
                 
                 result.append(data)
             
-            total_result.append(result)
+            total_result.append({
+                "sprint_name": pack.sprint_name,
+                "result": result
+            })
 
         return JSONResponse(content=total_result)
     except Exception as e:
