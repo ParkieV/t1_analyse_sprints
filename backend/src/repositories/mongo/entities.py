@@ -1,8 +1,9 @@
+import traceback
 from collections.abc import Callable, Coroutine, Sequence, Mapping
-from typing import Set, TypeVar, ParamSpec, Any
+from math import nan
+from typing import TypeVar, ParamSpec, Any
 
 from attrs import define
-from bson import ObjectId
 
 from src.logger import logger
 from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
@@ -38,7 +39,7 @@ class EntitiesCRUD(BaseMongoCRUD):
         entities = await self.collection.find({"entity_id": {'$in': entity_ids}}).to_list()
         return [EntitiesOutDTO(**entity) for entity in entities]
 
-    async def get_unique_areas(self) -> Set[str]:
+    async def get_unique_areas(self) -> set[str]:
         """ Получить уникальные области из коллекции 'entities' """
         logger.info('Fetching unique areas from entities')
         try:
@@ -66,3 +67,54 @@ class EntitiesCRUD(BaseMongoCRUD):
         logger.info('Entity model prepared successfully')
 
         return EntityOutDTO(**entity)
+
+    async def get_employees(self, employees: str | None = None, teams: str | None = None) -> list[str]:
+        employee_set: list[str] = {*employees.split(',')} if employees else []
+        team_list: list[str] = teams.split(',') if teams else []
+        try:
+            employees = await self.collection.find({'area': {'$in': team_list}}).distinct('created_by')
+            logger.debug(f'Found employees: {employees}')
+            employees += await self.collection.find({'area': {'$in': team_list}}).distinct('updated_by')
+            employees += await self.collection.find({'area': {'$in': team_list}}).distinct('assignee')
+            employees += await self.collection.find({'area': {'$in': team_list}}).distinct('owner')
+            employees_set = set(employees)
+            if employee_set:
+                employees_set.intersection_update(employee_set)
+            result = []
+            for employee in employees_set:
+                if isinstance(employee, str):
+                    result.append(employee)
+            logger.debug(f'Found employees: {result}')
+        except Exception as e:
+            logger.error(f"Failed to fetch unique areas. {e.__class__.__name__}: {e}")
+            raise
+
+        return result
+
+    async def _get_members_from_area(self, area: str) -> list[str]:
+        try:
+            employees = await self.collection.find({'area': area}).distinct('created_by')
+            logger.debug(f'Found employees: {employees}')
+            employees += await self.collection.find({'area': area}).distinct('created_by')
+            employees += await self.collection.find({'area': area}).distinct('updated_by')
+            employees += await self.collection.find({'area': area}).distinct('assignee')
+            employees += await self.collection.find({'area': area}).distinct('owner')
+            employees_set = set(employees)
+            result = []
+            for employee in employees_set:
+                if isinstance(employee, str):
+                    result.append(employee)
+            logger.debug(f'Found employees: {result}')
+        except Exception as e:
+            logger.error(f"Failed to fetch unique areas. {e.__class__.__name__}: {e}")
+            raise
+
+        return result
+
+    async def get_teams_with_members(self) -> Mapping[str, list[str]]:
+        try:
+            teams = await self.collection.distinct('area')
+            return {team: await self._get_members_from_area(team) for team in teams}
+        except Exception:
+            logger.error(f"Failed to fetch unique areas. {traceback.format_exc()}")
+            raise
