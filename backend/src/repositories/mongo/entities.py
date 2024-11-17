@@ -1,17 +1,18 @@
 import traceback
 from collections.abc import Callable, Coroutine, Sequence, Mapping
-from math import nan
 from typing import TypeVar, ParamSpec, Any
 
 from attrs import define
 
 from src.logger import logger
 from src.repositories.mongo.base_crud import BaseMongoCRUD, SchemaOut
+from src.repositories.mongo_context import MongoContext
 from src.schemas.data import EntitiesOutDTO, EntityOutDTO
 from src.schemas.user import CustomBaseModel
 
 T = TypeVar("T", bound=CustomBaseModel)
 P = ParamSpec("P")
+AsyncFunc = Callable[P, Coroutine[Any, Any, T]]
 AsyncSeqFunc = Callable[P, Coroutine[None, None, Sequence[T]]]
 
 @define
@@ -69,14 +70,15 @@ class EntitiesCRUD(BaseMongoCRUD):
         return EntityOutDTO(**entity)
 
     async def get_employees(self, employees: str | None = None, teams: str | None = None) -> list[str]:
-        employee_set: list[str] = {*employees.split(',')} if employees else []
+        employee_set: set[str] = {*employees.split(',')} if employees else None
         team_list: list[str] = teams.split(',') if teams else []
+        logger.debug(f'Filters: {employee_set}, {team_list}')
         try:
-            employees = await self.collection.find({'area': {'$in': team_list}}).distinct('created_by')
+            employees = await self.collection.find({'area': {'$in': team_list}} if len(team_list) > 0 else {}).distinct('created_by')
             logger.debug(f'Found employees: {employees}')
-            employees += await self.collection.find({'area': {'$in': team_list}}).distinct('updated_by')
-            employees += await self.collection.find({'area': {'$in': team_list}}).distinct('assignee')
-            employees += await self.collection.find({'area': {'$in': team_list}}).distinct('owner')
+            employees += await self.collection.find({'area': {'$in': team_list}} if len(team_list) > 0 else {}).distinct('updated_by')
+            employees += await self.collection.find({'area': {'$in': team_list}} if len(team_list) > 0 else {}).distinct('assignee')
+            employees += await self.collection.find({'area': {'$in': team_list}} if len(team_list) > 0 else {}).distinct('owner')
             employees_set = set(employees)
             if employee_set:
                 employees_set.intersection_update(employee_set)
@@ -90,6 +92,16 @@ class EntitiesCRUD(BaseMongoCRUD):
             raise
 
         return result
+
+    async def get_actual_sprint(self, employee: str, get_sprint_func: AsyncFunc):
+        entity_ids = await self.collection.find({'$or': [
+            {'created_by': employee},
+            {'updated_by': employee},
+            {'assignee': employee},
+            {'owner': employee}
+        ]}).distinct('entity_id')
+
+        return await get_sprint_func(entity_ids)
 
     async def _get_members_from_area(self, area: str) -> list[str]:
         try:
