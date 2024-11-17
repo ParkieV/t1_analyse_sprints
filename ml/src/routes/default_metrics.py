@@ -355,7 +355,7 @@ async def base_metrics_interval_splitted(time_left : datetime, time_right : date
                 "result": result
             })
 
-        return JSONResponse(content=total_result)
+        return JSONResponse(content={ "sprints": total_result, "intervals": [str(time) for time in times] })
     except Exception as e:
             print(e)
             return JSONResponse(content={'Error ocured': e}, status=500)
