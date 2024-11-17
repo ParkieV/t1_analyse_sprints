@@ -85,64 +85,109 @@ class UtilitiesCalulations:
 
 @add_router.get('/backlog_change')
 async def get_backlog_change(sprint_name : str, time : datetime):
-    db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
-    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    history_main_dict = dict()
-    sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
-    history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
-    for pack in sprints_data:
-        if pack.sprint_name == sprint_name:
-            instances = pack.entity_ids
-            sprint_end_date = pack.sprint_end_date
-            sprint_start_date = pack.sprint_start_date
-            if (time - sprint_start_date).days <= 2:
-                return JSONResponse(content={"backlog_changed_persents": 0})
-    
-    for event in history_data:  
-        if event.entity_id in instances:
-            add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
-    
-    x = UtilitiesCalulations(history_main_dict)
-    late_create =  0
-    for inst in instances:
-        late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
+    try:
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            if pack.sprint_name == sprint_name:
+                instances = pack.entity_ids
+                sprint_end_date = pack.sprint_end_date
+                sprint_start_date = pack.sprint_start_date
+                if (time - sprint_start_date).days <= 2:
+                    return JSONResponse(content={"backlog_changed_persents": 0})
+        
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+        
+        x = UtilitiesCalulations(history_main_dict)
+        late_create =  0
+        for inst in instances:
+            late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
 
-    data = {
-        "backlog_changed_persents": round(late_create / len(instances) * 100),
-        "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
-    }
+        data = {
+            "backlog_changed_persents": round(late_create / len(instances) * 100),
+            "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
+        }
 
-    return JSONResponse(content=data)
+        return JSONResponse(content=data)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={'Error ocured': e}, status=500)
 
 
 @add_router.get('/backlog_change_interval')
 async def get_backlog_change(sprint_name : str, time_left : datetime, time_right : datetime):
-    time = [time_left, time_right]
-    db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
-    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    history_main_dict = dict()
-    sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
-    history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
-    for pack in sprints_data:
-        if pack.sprint_name == sprint_name:
-            instances = pack.entity_ids
+    try:
+        time = [time_left, time_right]
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            if pack.sprint_name == sprint_name:
+                instances = pack.entity_ids
+                sprint_end_date = pack.sprint_end_date
+                sprint_start_date = pack.sprint_start_date
+                if (time_left - sprint_start_date).days <= 2 and (time_right - sprint_start_date).days <= 2:
+                    return JSONResponse(content={"backlog_changed_persents": 0, "Status" : "Good"})
+        
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+        
+        x = UtilitiesCalulations(history_main_dict)
+        late_create =  0
+        for inst in instances:
+            late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
+
+        data = {
+            "backlog_changed_persents": round(late_create / len(instances) * 100),
+            "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
+        }
+        return JSONResponse(content=data)
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={'Error ocured': e}, status=500)
+    
+
+@add_router.get('/backlog_change_all_sprints_interval')
+async def get_backlog_change(sprint_name : str, time_left : datetime, time_right : datetime):
+    try:
+        time = [time_left, time_right]
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        instances = []
+        for pack in sprints_data:
+            instances += pack.entity_ids
             sprint_end_date = pack.sprint_end_date
             sprint_start_date = pack.sprint_start_date
             if (time_left - sprint_start_date).days <= 2 and (time_right - sprint_start_date).days <= 2:
                 return JSONResponse(content={"backlog_changed_persents": 0, "Status" : "Good"})
-    
-    for event in history_data:  
-        if event.entity_id in instances:
-            add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
-    
-    x = UtilitiesCalulations(history_main_dict)
-    late_create =  0
-    for inst in instances:
-        late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
+            
+        
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+        
+        x = UtilitiesCalulations(history_main_dict)
+        late_create =  0
+        for inst in instances:
+            late_create = x.late_create_searcher(inst, late_create, time, sprint_start_date)
 
-    data = {
-        "backlog_changed_persents": round(late_create / len(instances) * 100),
-        "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
-    }
-    return JSONResponse(content=data)
+        data = {
+            "backlog_changed_persents": round(late_create / len(instances) * 100),
+            "Status" : "Good" if (value := round(late_create / len(instances) * 100)) < 20 else ("OK" if value <= 50 else "Bad")
+        }
+        return JSONResponse(content=data)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={'Error ocured': e}, status=500)
     

@@ -83,171 +83,183 @@ class UtilitiesCalulations:
 
 @router.get('/base_metrics_left_fix')
 async def get_fake_status_changes(sprint_name : str, time : datetime):
-    db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
-    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    history_main_dict = dict()
-    sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
-    history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
-    for pack in sprints_data:
-        if pack.sprint_name == sprint_name:
-            instances = pack.entity_ids
-            sprint_end_date = pack.sprint_end_date
-            break
-    for event in history_data:  
-        if event.entity_id in instances:
-            add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
-    
-    x = UtilitiesCalulations(history_main_dict)
-    according_to_date_len = 0
-    fake_changes = 0
-    last_day_completions = 0
-    metric= [0] * 4
-    for inst in instances:
-        fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
-        last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
-        metric = x.universal_sprint_counting_mashine(inst, time, metric)
+    try:
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            if pack.sprint_name == sprint_name:
+                instances = pack.entity_ids
+                sprint_end_date = pack.sprint_end_date
+                break
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
         
-        
-        
-    metrics_list = list(metric)
-    metrics_list.append(fake_changes)
-    metrics_list.append(last_day_completions)
-    tasks_sumary = sum(metrics_list[0:5])
-    metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-    print(metrics_list)
+        x = UtilitiesCalulations(history_main_dict)
+        according_to_date_len = 0
+        fake_changes = 0
+        last_day_completions = 0
+        metric= [0] * 4
+        for inst in instances:
+            fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
+            last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
+            metric = x.universal_sprint_counting_mashine(inst, time, metric)
+            
+            
+            
+        metrics_list = list(metric)
+        metrics_list.append(fake_changes)
+        metrics_list.append(last_day_completions)
+        tasks_sumary = sum(metrics_list[0:5])
+        metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
+        print(metrics_list)
 
 
-    data = {
-        "base_metrics_percentage": {
-            "rapid_changes": metrics_list_percent[4],
-            "last_day_completions": metrics_list_percent[5],
-            "fail": metrics_list_percent[0],
-            "success": metrics_list_percent[1],
-            "created": metrics_list_percent[2],
-            "ongoing": metrics_list_percent[3]
-        },
-        "base_metrics_numeric":{
-            "rapid_changes": metrics_list[4],
-            "last_day_completions": metrics_list[5],
-            "fail": metrics_list[0],
-            "success": metrics_list[1],
-            "created": metrics_list[2],
-            "ongoing": metrics_list[3]
+        data = {
+            "base_metrics_percentage": {
+                "rapid_changes": metrics_list_percent[4],
+                "last_day_completions": metrics_list_percent[5],
+                "fail": metrics_list_percent[0],
+                "success": metrics_list_percent[1],
+                "created": metrics_list_percent[2],
+                "ongoing": metrics_list_percent[3]
+            },
+            "base_metrics_numeric":{
+                "rapid_changes": metrics_list[4],
+                "last_day_completions": metrics_list[5],
+                "fail": metrics_list[0],
+                "success": metrics_list[1],
+                "created": metrics_list[2],
+                "ongoing": metrics_list[3]
+            }
         }
-    }
 
-    return JSONResponse(content=data)
+        return JSONResponse(content=data)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={'Error ocured': e}, status=500)
     
 
 @router.get('/base_metrics_interval')
 async def get_fake_status_changes(sprint_name : str, time_left : datetime, time_right : datetime):
-    time = [time_left, time_right]
-    db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
-    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    history_main_dict = dict()
-    sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
-    history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
-    for pack in sprints_data:
-        if pack.sprint_name == sprint_name:
-            instances = pack.entity_ids
-            sprint_end_date = pack.sprint_end_date
-            break
-    for event in history_data:  
-        if event.entity_id in instances:
-            add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
-    
-    x = UtilitiesCalulations(history_main_dict)
-    fake_changes = 0
-    last_day_completions = 0
-    metric= [0] * 4
-    for inst in instances:
-        fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
-        last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
-        metric = x.universal_sprint_counting_mashine(inst, time, metric)
+    try:
+        time = [time_left, time_right]
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            if pack.sprint_name == sprint_name:
+                instances = pack.entity_ids
+                sprint_end_date = pack.sprint_end_date
+                break
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
         
-        
-    metrics_list = list(metric)
-    metrics_list.append(fake_changes)
-    metrics_list.append(last_day_completions)
-    tasks_sumary = sum(metrics_list[0:5])
-    metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-    print(metrics_list)
+        x = UtilitiesCalulations(history_main_dict)
+        fake_changes = 0
+        last_day_completions = 0
+        metric= [0] * 4
+        for inst in instances:
+            fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
+            last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
+            metric = x.universal_sprint_counting_mashine(inst, time, metric)
+            
+            
+        metrics_list = list(metric)
+        metrics_list.append(fake_changes)
+        metrics_list.append(last_day_completions)
+        tasks_sumary = sum(metrics_list[0:5])
+        metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
+        print(metrics_list)
 
 
-    data = {
-        "base_metrics_percentage": {
-            "rapid_changes": metrics_list_percent[4],
-            "last_day_completions": metrics_list_percent[5],
-            "fail": metrics_list_percent[0],
-            "success": metrics_list_percent[1],
-            "created": metrics_list_percent[2],
-            "ongoing": metrics_list_percent[3]
-        },
-        "base_metrics_numeric":{
-            "rapid_changes": metrics_list[4],
-            "last_day_completions": metrics_list[5],
-            "fail": metrics_list[0],
-            "success": metrics_list[1],
-            "created": metrics_list[2],
-            "ongoing": metrics_list[3]
+        data = {
+            "base_metrics_percentage": {
+                "rapid_changes": metrics_list_percent[4],
+                "last_day_completions": metrics_list_percent[5],
+                "fail": metrics_list_percent[0],
+                "success": metrics_list_percent[1],
+                "created": metrics_list_percent[2],
+                "ongoing": metrics_list_percent[3]
+            },
+            "base_metrics_numeric":{
+                "rapid_changes": metrics_list[4],
+                "last_day_completions": metrics_list[5],
+                "fail": metrics_list[0],
+                "success": metrics_list[1],
+                "created": metrics_list[2],
+                "ongoing": metrics_list[3]
+            }
         }
-    }
 
-    return JSONResponse(content=data)
+        return JSONResponse(content=data)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={'Error ocured': e}, status=500)
 
 
 @router.get('/base_metrics_all_sprints_interval')
 async def get_fake_status_changes(time_left : datetime, time_right : datetime):
-    time = [time_left, time_right]
-    instances = []
-    db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
-    db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
-    history_main_dict = dict()
-    sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
-    history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
-    for pack in sprints_data:
-        instances += pack.entity_ids
-        sprint_end_date = pack.sprint_end_date
-    print(instances)
-    for event in history_data:  
-        if event.entity_id in instances:
-            add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
-    
-    x = UtilitiesCalulations(history_main_dict)
-    fake_changes = 0
-    last_day_completions = 0
-    metric = [0] * 4
-    for inst in instances:
-        fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
-        last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
-        metric = x.universal_sprint_counting_mashine(inst, time, metric)
+    try:
+        time = [time_left, time_right]
+        instances = []
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            instances += pack.entity_ids
+            sprint_end_date = pack.sprint_end_date
+        print(instances)
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
         
-        
-    metrics_list = list(metric)
-    metrics_list.append(fake_changes)
-    metrics_list.append(last_day_completions)
-    tasks_sumary = sum(metrics_list[0:5])
-    metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-    print(metrics_list)
+        x = UtilitiesCalulations(history_main_dict)
+        fake_changes = 0
+        last_day_completions = 0
+        metric = [0] * 4
+        for inst in instances:
+            fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
+            last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
+            metric = x.universal_sprint_counting_mashine(inst, time, metric)
+            
+            
+        metrics_list = list(metric)
+        metrics_list.append(fake_changes)
+        metrics_list.append(last_day_completions)
+        tasks_sumary = sum(metrics_list[0:5])
+        metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
+        print(metrics_list)
 
 
-    data = {
-        "base_metrics_percentage": {
-            "rapid_changes": metrics_list_percent[4],
-            "last_day_completions": metrics_list_percent[5],
-            "fail": metrics_list_percent[0],
-            "success": metrics_list_percent[1],
-            "created": metrics_list_percent[2],
-            "ongoing": metrics_list_percent[3]
-        },
-        "base_metrics_numeric":{
-            "rapid_changes": metrics_list[4],
-            "last_day_completions": metrics_list[5],
-            "fail": metrics_list[0],
-            "success": metrics_list[1],
-            "created": metrics_list[2],
-            "ongoing": metrics_list[3]
+        data = {
+            "base_metrics_percentage": {
+                "rapid_changes": metrics_list_percent[4],
+                "last_day_completions": metrics_list_percent[5],
+                "fail": metrics_list_percent[0],
+                "success": metrics_list_percent[1],
+                "created": metrics_list_percent[2],
+                "ongoing": metrics_list_percent[3]
+            },
+            "base_metrics_numeric":{
+                "rapid_changes": metrics_list[4],
+                "last_day_completions": metrics_list[5],
+                "fail": metrics_list[0],
+                "success": metrics_list[1],
+                "created": metrics_list[2],
+                "ongoing": metrics_list[3]
+            }
         }
-    }
 
-    return JSONResponse(content=data)
+        return JSONResponse(content=data)
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={'Error ocured': e}, status=500)
