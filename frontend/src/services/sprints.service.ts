@@ -18,4 +18,9 @@ export class SprintsService {
       },
     });
   }
+
+  getSprint(id: string) {
+    const url = `data/sprints/${id}`;
+    return this._apiService.get(url);
+  }
 }

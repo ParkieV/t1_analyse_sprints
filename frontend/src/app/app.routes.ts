@@ -21,7 +21,7 @@ export const routes: Routes = [
     component: SprintsComponent,
   },
   {
-    path: 'sprints/:id',
+    path: 'sprints/:sprintId',
     component: SprintDetailComponent,
     children: [
       {
