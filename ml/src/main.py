@@ -22,7 +22,7 @@ app.include_router(person_router)
 if __name__ == "__main__":
     try:
         import uvicorn
-        # uvicorn.run("src.main:app", host=os.getenv("ML_HOST"), port=os.getenv("ML_PORT"))
-        uvicorn.run("src.main:app", host='localhost', port=8000, reload=True)
+        uvicorn.run("src.main:app", host=os.getenv("ML_HOST"), port=os.getenv("ML_PORT"))
+        # uvicorn.run("src.main:app", host='localhost', port=8000, reload=True)
     except KeyboardInterrupt:
         print("Сервер остановлен.")
