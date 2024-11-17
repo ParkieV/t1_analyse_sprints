@@ -1,15 +1,28 @@
 <app-home-filters></app-home-filters>
 
-<div class="card-container">
-    <app-chart-card [value]="1" title="Успешно закрытые спринты" [change]="3"></app-chart-card>
-    <app-chart-card [value]="1" title="Успешно закрытые спринты" [change]="0"></app-chart-card>
-    <app-chart-card [value]="1" title="Успешно закрытые спринты" [change]="-7"></app-chart-card>
+<div *ngIf="res" class="card-container">
+  <app-chart-card
+    [value]="created"
+    title="К выполнению"
+    [change]="0"
+  ></app-chart-card>
+  <app-chart-card
+    [value]="ongoing"
+    title="В работе"
+    [change]="0"
+  ></app-chart-card>
+  <app-chart-card
+    [value]="success"
+    title="Сделано"
+    [change]="0"
+  ></app-chart-card>
+  <app-chart-card [value]="fail" title="Снято" [change]="0"></app-chart-card>
 </div>
 
 <div class="main-container">
-    <app-task-cycle-analysis></app-task-cycle-analysis>
-    <div class="main-column">
-        <app-load-indicator></app-load-indicator>
-        <app-team-efficiency></app-team-efficiency>
-    </div>
+  <app-task-cycle-analysis [dates]="dates!" [allSprints]="allSprints!"></app-task-cycle-analysis>
+  <div class="main-column">
+    <app-load-indicator [value]="health"></app-load-indicator>
+    <app-team-efficiency></app-team-efficiency>
+  </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { LoadIndicatorScaleComponent } from "./load-indicator-scale/load-indicator-scale.component";
 
 @Component({
@@ -10,10 +10,11 @@ import { LoadIndicatorScaleComponent } from "./load-indicator-scale/load-indicat
 })
 export class LoadIndicatorComponent {
 
+  @Input()
   value: number = 70;
 
-  title: string = 'Оптимально';
+  title: string = 'Здоровье по всем спринтам';
 
-  subtitle: string = 'Сотрудники загружены оптимально';
+  subtitle: string = '';
 
 }

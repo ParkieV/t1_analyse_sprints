@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { dataSeries } from './data-series';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TaskCycleAnalysisChartComponent } from './task-cycle-analysis-chart/task-cycle-analysis-chart.component';
 import { TaskCycleAnalysisOptionComponent } from './task-cycle-analysis-option/task-cycle-analysis-option.component';
 import { CHART_COLORS } from '../../../models/chart-colors';
-
+import { SprintMetricsGroup } from '../../../models/sprint.model';
 
 interface Option {
   title: string;
@@ -15,37 +15,50 @@ interface Option {
 @Component({
   selector: 'app-task-cycle-analysis',
   standalone: true,
-  imports: [CommonModule, TaskCycleAnalysisChartComponent, TaskCycleAnalysisOptionComponent],
+  imports: [
+    CommonModule,
+    TaskCycleAnalysisChartComponent,
+    TaskCycleAnalysisOptionComponent,
+  ],
   templateUrl: './task-cycle-analysis.component.html',
   styleUrl: './task-cycle-analysis.component.scss',
 })
 export class TaskCycleAnalysisComponent {
+  @Input()
+  dates!: Date[];
 
-  title: string = '8 дней';
+  @Input() set allSprints(
+    value: { sprintName: string; result: SprintMetricsGroup[] }[]
+  ) {
+    debugger;
+    setTimeout(() => {
+      let i = 0;
+      this.options = value.map((sprint) => {
+        const dataSeries = [];
+        for (let j = 0; j < sprint.result.length; j++) {
+          dataSeries.push({
+            date: this.dates[j],
+            value: sprint.result[j].health.healthValue,
+          });
+        }
+        return {
+          title: sprint.sprintName,
+          color: CHART_COLORS[i++],
+          dataSeries: dataSeries,
+        };
+      });
+      this.activeOption = this.options[0];
+      debugger;
+    });
+  }
 
-  subtitle: string = 'Среднее время потраченное на задачу';
+  title: string = 'Здоровье';
 
-  options: Option[] = [
-    {
-      title: 'К выполнению',
-      color: CHART_COLORS[0],
-      dataSeries: dataSeries.slice(),
-    },
-    {
-      title: 'В работе',
-      color: CHART_COLORS[1],
-      dataSeries: dataSeries.slice(),
-    },
-    {
-      title: 'Сделано',
-      color: CHART_COLORS[2],
-      dataSeries: dataSeries.slice(),
-    },
-  ];
+  subtitle: string = 'Спринты за последний месяц';
+
+  options?: Option[];
 
   activeOption!: Option;
 
-  ngOnInit() {
-    this.activeOption = this.options[0];
-  }
+  ngOnInit() {}
 }

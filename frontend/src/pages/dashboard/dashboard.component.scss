@@ -1,0 +1,9 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+app-dashboard-container {
+    min-height: 80vh;
+}

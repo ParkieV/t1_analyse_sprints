@@ -30,7 +30,9 @@
           {{ "sprints.progressCell" | translate }}
         </th>
         <td mat-cell *matCellDef="let sprint">
-          <div class="progress-cell"></div>
+          <div class="progress-cell">
+          {{ sprint.metrics.health.healthValue }}
+          </div>
         </td>
       </ng-container>
 

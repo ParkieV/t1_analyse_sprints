@@ -1,0 +1,70 @@
+<div class="card">
+    <div class="table-wrapper">
+      <div class="header-background"></div>
+  
+      <table class="table" #tableRef mat-table matSort [dataSource]="dataSource">
+        <ng-container matColumnDef="name">
+          <th class="header-cell" mat-header-cell *matHeaderCellDef>
+            {{ "employees.nameCell" | translate }}
+          </th>
+          <td mat-cell *matCellDef="let employee">
+            <div class="name-cell">
+              {{ employee.employee }}
+            </div>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="sprint">
+          <th class="header-cell" mat-header-cell *matHeaderCellDef>
+            {{ "employees.sprintCell" | translate }}
+          </th>
+          <td mat-cell *matCellDef="let employee">
+            <div class="sprint">
+              {{ employee.sprint }}
+            </div>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="area">
+          <th class="header-cell" mat-header-cell *matHeaderCellDef>
+            {{ "employees.areaCell" | translate }}
+          </th>
+          <td mat-cell *matCellDef="let employee">
+            <div class="area">
+              {{ employee.area }}
+            </div>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="lastChanges">
+          <th class="header-cell" mat-header-cell *matHeaderCellDef>
+            {{ "employees.lastChangesCell" | translate }}
+          </th>
+          <td mat-cell *matCellDef="let employee">
+            <div class="last-changes-cell"></div>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="more">
+          <th class="header-cell" mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let employee">
+            <a class="more" [routerLink]="employee.id">{{
+              "employees.more" | translate
+            }}</a>
+          </td>
+        </ng-container>
+  
+        <tr
+          class="table-header"
+          mat-header-row
+          *matHeaderRowDef="tableColumns; sticky: true"
+        ></tr>
+        <tr
+          class="table-row"
+          mat-row
+          *matRowDef="let row; columns: tableColumns"
+        ></tr>
+      </table>
+    </div>
+  </div>
+  

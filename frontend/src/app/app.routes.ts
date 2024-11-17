@@ -9,6 +9,7 @@ import { TeamsComponent } from '../pages/teams/teams.component';
 import { SprintDetailComponent } from '../pages/sprint-detail/sprint-detail.component';
 import { SprintDetailMainComponent } from '../pages/sprint-detail/sprint-detail-main/sprint-detail-main.component';
 import { SprintDetailTasksComponent } from '../pages/sprint-detail/sprint-detail-tasks/sprint-detail-tasks.component';
+import { StaffRegistryComponent } from '../pages/staff-registry/staff-registry.component';
 
 export const routes: Routes = [
   {
@@ -21,7 +22,7 @@ export const routes: Routes = [
     component: SprintsComponent,
   },
   {
-    path: 'sprints/:id',
+    path: 'sprints/:sprintId',
     component: SprintDetailComponent,
     children: [
       {
@@ -45,6 +46,10 @@ export const routes: Routes = [
   {
     path: 'teams',
     component: TeamsComponent,
+  },
+  {
+    path: 'staff',
+    component: StaffRegistryComponent,
   },
   {
     path: 'sign-in',
