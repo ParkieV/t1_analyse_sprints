@@ -6,5 +6,12 @@
     "projectCell": "Проект",
     "lastChangesCell": "Последние изменения",
     "more": "Подробнее"
+  },
+  "employees": {
+    "nameCell": "Имя",
+    "sprintCell": "Спринт",
+    "areaCell": "Проект",
+    "lastChangesCell": "Последние изменения",
+    "more": "Подробнее"
   }
 }
