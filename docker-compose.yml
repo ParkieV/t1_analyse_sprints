@@ -4,8 +4,6 @@ services:
     platform: linux/arm64
     restart: unless-stopped
     env_file: .env
-    ports:
-      - "27017:27017"
     volumes:
       - db_data:/data/db
       - ./create_local_user.js:/docker-entrypoint-initdb.d/create_local_user.js
