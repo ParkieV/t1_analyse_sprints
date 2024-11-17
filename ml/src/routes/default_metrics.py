@@ -115,7 +115,14 @@ async def get_fake_status_changes(sprint_name : str, time : datetime):
         metrics_list.append(last_day_completions)
         tasks_sumary = sum(metrics_list[0:5])
         metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-        print(metrics_list)
+        health_value = 100
+        if metrics_list_percent[4] > 10:
+            health_value -= ((10 - metrics_list_percent[4]) * 2)
+        if metrics_list_percent[5] > 20:
+            health_value -= ((20 - metrics_list_percent[4]))
+        health_value -= metrics_list_percent[0]
+        health_value -= (metrics_list_percent[3] // 2)
+        health_value -= (metrics_list_percent[2] // 3)
 
 
         data = {
@@ -134,7 +141,8 @@ async def get_fake_status_changes(sprint_name : str, time : datetime):
                 "success": metrics_list[1],
                 "created": metrics_list[2],
                 "ongoing": metrics_list[3]
-            }
+            },
+            "health" : {'health_value' :  health_value}
         }
 
         return JSONResponse(content=data)
@@ -176,8 +184,14 @@ async def get_fake_status_changes(sprint_name : str, time_left : datetime, time_
         metrics_list.append(last_day_completions)
         tasks_sumary = sum(metrics_list[0:5])
         metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-        print(metrics_list)
-
+        health_value = 100
+        if metrics_list_percent[4] > 10:
+            health_value -= ((10 - metrics_list_percent[4]) * 2)
+        if metrics_list_percent[5] > 20:
+            health_value -= ((20 - metrics_list_percent[4]))
+        health_value -= metrics_list_percent[0]
+        health_value -= (metrics_list_percent[3] // 2)
+        health_value -= (metrics_list_percent[2] // 3)
 
         data = {
             "base_metrics_percentage": {
@@ -195,7 +209,8 @@ async def get_fake_status_changes(sprint_name : str, time_left : datetime, time_
                 "success": metrics_list[1],
                 "created": metrics_list[2],
                 "ongoing": metrics_list[3]
-            }
+            },
+            "health" : {'health_value' :  health_value}
         }
 
         return JSONResponse(content=data)
@@ -237,9 +252,15 @@ async def get_fake_status_changes(time_left : datetime, time_right : datetime):
         metrics_list.append(last_day_completions)
         tasks_sumary = sum(metrics_list[0:5])
         metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-        print(metrics_list)
-
-
+        health_value = 100
+        if metrics_list_percent[4] > 10:
+            health_value -= ((10 - metrics_list_percent[4]) * 2)
+        if metrics_list_percent[5] > 20:
+            health_value -= ((20 - metrics_list_percent[4]))
+        health_value -= metrics_list_percent[0]
+        health_value -= (metrics_list_percent[3] // 2)
+        health_value -= (metrics_list_percent[2] // 3)
+        
         data = {
             "base_metrics_percentage": {
                 "rapid_changes": metrics_list_percent[4],
@@ -256,7 +277,8 @@ async def get_fake_status_changes(time_left : datetime, time_right : datetime):
                 "success": metrics_list[1],
                 "created": metrics_list[2],
                 "ongoing": metrics_list[3]
-            }
+            },
+            "health" : {'health_value' :  health_value}
         }
 
         return JSONResponse(content=data)
