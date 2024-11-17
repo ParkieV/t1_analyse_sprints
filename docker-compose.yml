@@ -41,8 +41,6 @@ services:
     build:
       context: ml
       dockerfile: Dockerfile
-    environment:
-      - HOST = 0.0.0.0
     depends_on:
       database:
         condition: service_started
