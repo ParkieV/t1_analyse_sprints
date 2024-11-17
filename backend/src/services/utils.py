@@ -1,5 +1,7 @@
 from multiprocessing.context import AuthenticationError
+from typing import Any
 
+import aiohttp
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException
 
@@ -16,3 +18,13 @@ def check_token(token: str = Depends(AuthHandler.oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
+
+async def fetch_url(url: str) -> Any:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            print(f"Status: {response.status}")
+            try:
+                content = await response.json()
+                return content
+            except:
+                return None

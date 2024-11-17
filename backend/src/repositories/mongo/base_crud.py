@@ -62,3 +62,12 @@ class BaseMongoCRUD:
         except Exception as e:
             logger.error(f"Failed to insert objects. {e.__class__.__name__}: {e}", )
             raise
+
+    async def get_column_values(self, column_name: str) -> Sequence[Any]:
+        try:
+            values = await self.collection.distinct(column_name)
+        except Exception as e:
+            logger.error(f"Failed to find column values. {e.__class__.__name__}: {e}", )
+            raise
+
+        return values
