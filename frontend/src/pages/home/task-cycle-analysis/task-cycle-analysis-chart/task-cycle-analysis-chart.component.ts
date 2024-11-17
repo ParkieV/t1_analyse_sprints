@@ -35,6 +35,7 @@ export class TaskCycleAnalysisChartComponent {
   
   @Input({ required: true })
   public get dataSeries(): { date: string; value: number; }[] {
+    
     return this._dataSeries;
   }
   public set dataSeries(value: { date: string; value: number; }[]) {

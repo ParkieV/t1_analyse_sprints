@@ -8,12 +8,14 @@ import {
   map,
   mergeMap,
   Observable,
+  of,
   switchMap,
   tap,
   toArray,
 } from 'rxjs';
 import { Sprint, SprintMetricsGroup } from '../models/sprint.model';
 import { MlApiService } from './ml-api.service';
+import { data } from './data';
 
 function padZeros(v: number): string {
   const s = v.toString();
@@ -126,7 +128,8 @@ export class SprintsService {
     dateTo: Date
   ): Observable<{sprints: {sprintName: string, result: SprintMetricsGroup[]}[], intervals: string[]}> {
     const url = 'base_metrics_interval_splitted_for_all';
-    // debugger;
+    // debugger;w
+    return of(data);
     const dateFromString = getDateString(dateFrom);
     const dateToString = getDateString(dateTo);
     return this._mlApiService.get(url, {
