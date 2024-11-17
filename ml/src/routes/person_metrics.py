@@ -241,3 +241,54 @@ async def get_person_busines_all_sprints(person_name : str):
     except Exception as e:
         print(e)
         return JSONResponse(content={'Error ocured': 'error'}, status=500)
+    
+
+@person_router.get('/all_person_busines_all')
+async def get_all_person_busines_all_sprints():
+    try:
+        instances = []
+        db_context_enteties = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        entities_main_dict = dict()
+        enteties_data = list(await db_context_enteties.crud.get_objects(EntitiesOutDTO))
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            instances += pack.entity_ids
+            sprint_end_date = pack.sprint_end_date
+            
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+                
+        for entity in enteties_data:
+            if entity.entity_id in instances:
+                add_or_update_key(entities_main_dict, entity.assignee, (list(dict(entity).values())[1:]))
+        
+        x = UtilitiesCalulations(history_main_dict)
+        
+        # print(entities_main_dict.keys()) 'Н. Н.'
+        metric = [0] * 4
+        for person_instance in entities_main_dict.keys():
+            inst = person_instance[0]
+            metric = x.universal_sprint_counting_mashine(inst, datetime(2100, 1, 1, 1), metric)
+                
+        metrics_list = list(metric)
+        tasks_sumary = sum(metrics_list[0:5])
+        metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
+        print(metrics_list, metrics_list_percent)
+        busines_percent = round(metrics_list[3] + metrics_list[2] / tasks_sumary * 100)
+        
+
+        return JSONResponse(content={
+                    'metrics' : {
+                        "fail": metrics_list[0],
+                        "success": metrics_list[1],
+                        "created": metrics_list[2],
+                        "ongoing": metrics_list[3]
+                    }, 'total' : tasks_sumary, 'busines' : {'busines_percent' : busines_percent} })
+    except Exception as e:
+        print(e)
+        return JSONResponse(content={'Error ocured': 'error'}, status=500)

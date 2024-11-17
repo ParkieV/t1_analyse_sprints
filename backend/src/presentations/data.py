@@ -1,3 +1,4 @@
+import aiohttp
 import pandas as pd
 from bson import ObjectId
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
@@ -7,7 +8,7 @@ from src.logger import logger
 from src.schemas.data import EntitiesOutDTO, HistoriesOutDTO, SprintsOutDTO
 from src.services.utils import check_token
 from src.repositories.mongo import EntitiesCRUD, SprintsCRUD, HistoriesCRUD
-from src.services.parse_data import add_data_to_db, db_context
+from src.services.parse_data import add_data_to_db
 from src.repositories.mongo_context import MongoContext
 
 router = APIRouter(prefix="/data", tags=["Data endpoints"])
@@ -120,6 +121,9 @@ async def get_employees(employees: str | None = None, teams: str | None = None):
         employee_dict['employee'] = employee
         employee_dict['sprint'] = await db_context_entities.crud.get_actual_sprint(employee, db_context_sprints.crud.get_last_sprint)
         logger.debug(employee_dict['sprint'])
+        if employee_dict['business']:
+            employee_dict['business'] = employee_dict['business']['busines']['busines_percent']
+
         employees_list.append(employee_dict)
     return employees_list
 
@@ -129,12 +133,13 @@ async def get_teams():
     return await db_context.crud.get_teams_with_members()
 
 @router.get('/search/sprints', dependencies=[Depends(check_token)])
-async def get_sprints(search_query: str):
+async def search_sprints(search_query: str):
     db_context = MongoContext[SprintsCRUD](crud=SprintsCRUD())
 
     data = await db_context.crud.get_column_values('sprint_name')
     logger.debug(f'sprint data: {data}')
     data_df = pd.DataFrame(data, columns=['sprint_name'])
+
 
     matches = process.extract(search_query, data, scorer=fuzz.ratio)
     logger.debug(f'matches: {matches}')
@@ -147,7 +152,7 @@ async def get_sprints(search_query: str):
     return result
 
 @router.get('/search/entities', dependencies=[Depends(check_token)])
-async def get_entities(search_query: str):
+async def search_entities(search_query: str):
     db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
 
     data = await db_context.crud.get_column_values('name')
@@ -165,7 +170,7 @@ async def get_entities(search_query: str):
     return result
 
 @router.get('/search/histories', dependencies=[Depends(check_token)])
-async def get_histories(search_query: str):
+async def search_histories(search_query: str):
     db_context = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
 
     data = await db_context.crud.get_column_values('history_property_name')
