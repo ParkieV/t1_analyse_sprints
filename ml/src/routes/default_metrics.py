@@ -7,6 +7,19 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter(tags=["base endpoints"])
 
+
+def calculate_health(metrics_list_percent):
+    health_value = 100
+    if metrics_list_percent[4] > 10:
+        health_value += ((10 - metrics_list_percent[4]) * 2)
+    if metrics_list_percent[5] > 20:
+        health_value += ((20 - metrics_list_percent[5]))
+    health_value -= metrics_list_percent[0]
+    health_value -= (metrics_list_percent[3] // 2)
+    health_value -= (metrics_list_percent[2] // 3)
+    return health_value
+    
+
 def add_or_update_key(dictionary : dict, key, value_to_add):
     dictionary[key] = dictionary.setdefault(key, [])
     dictionary[key].append(value_to_add)
@@ -94,6 +107,7 @@ async def get_fake_status_changes(sprint_name : str, time : datetime):
                 instances = pack.entity_ids
                 sprint_end_date = pack.sprint_end_date
                 break
+        
         for event in history_data:  
             if event.entity_id in instances:
                 add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
@@ -115,16 +129,7 @@ async def get_fake_status_changes(sprint_name : str, time : datetime):
         metrics_list.append(last_day_completions)
         tasks_sumary = sum(metrics_list[0:5])
         metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-        health_value = 100
-        if metrics_list_percent[4] > 10:
-            health_value -= ((10 - metrics_list_percent[4]) * 2)
-        if metrics_list_percent[5] > 20:
-            health_value -= ((20 - metrics_list_percent[4]))
-        health_value -= metrics_list_percent[0]
-        health_value -= (metrics_list_percent[3] // 2)
-        health_value -= (metrics_list_percent[2] // 3)
-
-
+        health_value = calculate_health(metrics_list_percent)
         data = {
             "base_metrics_percentage": {
                 "rapid_changes": metrics_list_percent[4],
@@ -184,14 +189,7 @@ async def get_fake_status_changes(sprint_name : str, time_left : datetime, time_
         metrics_list.append(last_day_completions)
         tasks_sumary = sum(metrics_list[0:5])
         metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-        health_value = 100
-        if metrics_list_percent[4] > 10:
-            health_value -= ((10 - metrics_list_percent[4]) * 2)
-        if metrics_list_percent[5] > 20:
-            health_value -= ((20 - metrics_list_percent[4]))
-        health_value -= metrics_list_percent[0]
-        health_value -= (metrics_list_percent[3] // 2)
-        health_value -= (metrics_list_percent[2] // 3)
+        health_value = calculate_health(metrics_list_percent)
 
         data = {
             "base_metrics_percentage": {
@@ -214,6 +212,147 @@ async def get_fake_status_changes(sprint_name : str, time_left : datetime, time_
         }
 
         return JSONResponse(content=data)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={'Error ocured': e}, status=500)
+
+@router.get('/base_metrics_interval_splitted')
+async def base_metrics_interval_splitted(sprint_name : str, time_left : datetime, time_right : datetime, splits: int):
+    try:
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        for pack in sprints_data:
+            if pack.sprint_name == sprint_name:
+                instances = pack.entity_ids
+                sprint_end_date = pack.sprint_end_date
+                break
+        for event in history_data:  
+            if event.entity_id in instances:
+                add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+        
+        x = UtilitiesCalulations(history_main_dict)
+        interval = time_right - time_left
+        period = interval / splits
+        times = []
+        for i in range(splits + 1):
+            times.append(time_left + period * i)
+        result = []
+        for time in times:
+            fake_changes = 0
+            last_day_completions = 0
+            metric= [0] * 4
+            for inst in instances:
+                fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
+                last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
+                metric = x.universal_sprint_counting_mashine(inst, time, metric)
+                
+                
+            metrics_list = list(metric)
+            metrics_list.append(fake_changes)
+            metrics_list.append(last_day_completions)
+            tasks_sumary = sum(metrics_list[0:5])
+            metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
+            health_value = calculate_health(metrics_list_percent)
+
+            data = {
+                "base_metrics_percentage": {
+                    "rapid_changes": metrics_list_percent[4],
+                    "last_day_completions": metrics_list_percent[5],
+                    "fail": metrics_list_percent[0],
+                    "success": metrics_list_percent[1],
+                    "created": metrics_list_percent[2],
+                    "ongoing": metrics_list_percent[3]
+                },
+                "base_metrics_numeric":{
+                    "rapid_changes": metrics_list[4],
+                    "last_day_completions": metrics_list[5],
+                    "fail": metrics_list[0],
+                    "success": metrics_list[1],
+                    "created": metrics_list[2],
+                    "ongoing": metrics_list[3]
+                },
+                "health" : {'health_value' :  health_value}
+            }
+            
+            result.append(data)
+
+        return JSONResponse(content=result)
+    except Exception as e:
+            print(e)
+            return JSONResponse(content={'Error ocured': e}, status=500)
+
+
+@router.get('/base_metrics_interval_splitted_for_all')
+async def base_metrics_interval_splitted(time_left : datetime, time_right : datetime, splits: int):
+    try:
+        db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
+        db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
+        history_main_dict = dict()
+        sprints_data = list(await db_context_sprints.crud.get_objects(SprintsOutDTO))
+        history_data = list(await db_context_history.crud.get_objects(HistoriesOutDTO))
+        
+        total_result = []
+        
+        for pack in sprints_data:
+            instances = pack.entity_ids
+            sprint_end_date = pack.sprint_end_date
+            
+            for event in history_data:  
+                if event.entity_id in instances:
+                    add_or_update_key(history_main_dict, event.entity_id, list(dict(event).values())[2:])
+            
+            x = UtilitiesCalulations(history_main_dict)
+            interval = time_right - time_left
+            period = interval / splits
+            times = []
+            for i in range(splits + 1):
+                times.append(time_left + period * i)
+            result = []
+            for time in times:
+                fake_changes = 0
+                last_day_completions = 0
+                metric= [0] * 4
+                for inst in instances:
+                    fake_changes = x.search_through_status_changes(inst, fake_changes,  time)
+                    last_day_completions = x.search_for_last_day_status_change(inst, sprint_end_date, last_day_completions, time)
+                    metric = x.universal_sprint_counting_mashine(inst, time, metric)
+                    
+                    
+                metrics_list = list(metric)
+                metrics_list.append(fake_changes)
+                metrics_list.append(last_day_completions)
+                tasks_sumary = sum(metrics_list[0:5])
+                metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
+                health_value = calculate_health(metrics_list_percent)
+
+                data = {
+                    "base_metrics_percentage": {
+                        "rapid_changes": metrics_list_percent[4],
+                        "last_day_completions": metrics_list_percent[5],
+                        "fail": metrics_list_percent[0],
+                        "success": metrics_list_percent[1],
+                        "created": metrics_list_percent[2],
+                        "ongoing": metrics_list_percent[3]
+                    },
+                    "base_metrics_numeric":{
+                        "rapid_changes": metrics_list[4],
+                        "last_day_completions": metrics_list[5],
+                        "fail": metrics_list[0],
+                        "success": metrics_list[1],
+                        "created": metrics_list[2],
+                        "ongoing": metrics_list[3]
+                    },
+                    "health" : {'health_value' :  health_value}
+                }
+                
+                result.append(data)
+            
+            total_result.append(result)
+
+        return JSONResponse(content=total_result)
     except Exception as e:
             print(e)
             return JSONResponse(content={'Error ocured': e}, status=500)
@@ -252,14 +391,7 @@ async def get_fake_status_changes(time_left : datetime, time_right : datetime):
         metrics_list.append(last_day_completions)
         tasks_sumary = sum(metrics_list[0:5])
         metrics_list_percent = list(map(lambda x: round(x / tasks_sumary * 100), metrics_list))
-        health_value = 100
-        if metrics_list_percent[4] > 10:
-            health_value -= ((10 - metrics_list_percent[4]) * 2)
-        if metrics_list_percent[5] > 20:
-            health_value -= ((20 - metrics_list_percent[4]))
-        health_value -= metrics_list_percent[0]
-        health_value -= (metrics_list_percent[3] // 2)
-        health_value -= (metrics_list_percent[2] // 3)
+        health_value = calculate_health(metrics_list_percent)
         
         data = {
             "base_metrics_percentage": {

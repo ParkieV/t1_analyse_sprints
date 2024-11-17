@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { SprintsService } from '../../services/sprints.service';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { SprintDetail, SprintEntity } from '../../models/sprint.model';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +15,11 @@ export class SprintDetailService {
   loads = new BehaviorSubject<boolean>(false);
 
   kanban: { status: string; tasks: SprintEntity[] }[] = [];
+
+  filters = new FormGroup({
+    startDate: new FormControl(),
+    endDate: new FormControl(),
+  });
 
   priority: { [key: string]: number } = {
     Создано: 1,
@@ -30,8 +36,8 @@ export class SprintDetailService {
     Отложен: 11,
     СТ: 12,
     'СТ Завершено': 13,
-    'Подтверждение': 14,
-    'Локализация': 15,
+    Подтверждение: 14,
+    Локализация: 15,
   };
 
   constructor(private readonly _sprintsService: SprintsService) {}
@@ -56,12 +62,9 @@ export class SprintDetailService {
       });
     });
 
-    debugger;
-    this.kanban.sort(
-      (a, b) => {
-        const result = this.priority[a.status] - this.priority[b.status]
-        return result;
-      }
-    );
+    this.kanban.sort((a, b) => {
+      const result = this.priority[a.status] - this.priority[b.status];
+      return result;
+    });
   }
 }

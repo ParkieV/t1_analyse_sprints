@@ -5,6 +5,7 @@ export interface Sprint {
   sprintStartDate: string; // '2024-07-03T19:00:00';
   sprintEndDate: string; // '2024-07-16T19:00:00';
   entityIds: number[];
+  metrics: SprintMetricsGroup;
 }
 
 export type SprintStatus = 'Закрыт' | string;
@@ -42,4 +43,19 @@ export interface SprintEntity {
   spent: number; // 28800;
   workgroup: string; // null;
   resolution: string; // 'Готово';
+}
+
+export interface SprintMetrics {
+  rapidChanges: number;
+  lastDayCompletions: number;
+  fail: number;
+  success: number;
+  created: number;
+  ongoing: number;
+}
+
+export interface SprintMetricsGroup {
+  baseMetricsPercentage: SprintMetrics;
+  baseMetricsNumeric: SprintMetrics;
+  health: { healthValue: number };
 }
