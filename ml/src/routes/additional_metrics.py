@@ -156,7 +156,7 @@ async def get_backlog_change(sprint_name : str, time_left : datetime, time_right
     
 
 @add_router.get('/backlog_change_all_sprints_interval')
-async def get_backlog_change(sprint_name : str, time_left : datetime, time_right : datetime):
+async def get_backlog_change(time_left : datetime, time_right : datetime):
     try:
         time = [time_left, time_right]
         db_context_history = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
@@ -190,4 +190,6 @@ async def get_backlog_change(sprint_name : str, time_left : datetime, time_right
     except Exception as e:
             print(e)
             return JSONResponse(content={'Error ocured': e}, status=500)
-    
+
+# @add_router.get('/blocked_in_hh')
+# async def get_backlog_change(time_left : datetime, time_right : datetime):
