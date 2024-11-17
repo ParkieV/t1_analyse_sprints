@@ -58,7 +58,7 @@ async def get_entities(page_number: int,
     return await db_context.crud.get_objects(EntitiesOutDTO, (page_number - 1) * page_size, page_size)
 
 @router.get('/entities/{entity_id}', dependencies=[Depends(check_token)])
-async def get_sprint(entity_id: int):
+async def get_entity(entity_id: int):
     db_context_entities = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     db_context_histories = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
 
@@ -66,14 +66,14 @@ async def get_sprint(entity_id: int):
 
 
 @router.get('/histories', dependencies=[Depends(check_token)])
-async def get_entities(page_number: int,
+async def get_histories(page_number: int,
                        page_size: int = 15):
     db_context = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
     return await db_context.crud.get_objects(HistoriesOutDTO, (page_number - 1) * page_size, page_size)
 
 
 @router.get('/sprints', dependencies=[Depends(check_token)])
-async def get_entities(page_number: int,
+async def get_sprints(page_number: int,
                        page_size: int = 15):
     db_context_sprints = MongoContext[SprintsCRUD](crud=SprintsCRUD())
 
@@ -83,12 +83,12 @@ async def get_entities(page_number: int,
 
 
 @router.get('/areas', dependencies=[Depends(check_token)])
-async def get_entities():
+async def get_areas():
     db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
     return await db_context.crud.get_unique_areas()
 
 @router.get('/change_types', dependencies=[Depends(check_token)])
-async def get_entities():
+async def get_change_types():
     db_context = MongoContext[HistoriesCRUD](crud=HistoriesCRUD())
     return await db_context.crud.get_change_types()
 
@@ -106,3 +106,13 @@ async def get_sprint(sprint_id: str):
     sprint = await db_context_sprints.crud.get_object_by_id(obj_sprint_id, db_context_entities.crud.get_entities_by_sprint_id)
 
     return sprint
+
+@router.get('/employees', dependencies=[Depends(check_token)])
+async def get_employees(employees: str | None = None, teams: str | None = None):
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_employees(employees, teams)
+
+@router.get('/commands', dependencies=[Depends(check_token)])
+async def get_teams():
+    db_context = MongoContext[EntitiesCRUD](crud=EntitiesCRUD())
+    return await db_context.crud.get_teams_with_members()

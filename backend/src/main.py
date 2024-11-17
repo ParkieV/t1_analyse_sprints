@@ -13,19 +13,12 @@ async def lifespan(app: FastAPI):
     await MongoContext.check_connection()
     yield
 
-try:
-    app = FastAPI(lifespan=lifespan, root_path="/api")
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=['*'],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.include_router(router)
-except Exception as e:
-    print(e.__class__.__name__, e)
-    raise e
-except BaseException as e:
-    print(e.__class__.__name__, e)
-    raise e
+app = FastAPI(lifespan=lifespan, root_path="/api")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(router)
